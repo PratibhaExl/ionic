@@ -21,10 +21,10 @@ function MyForm() {
       {fields.map(field => (
         <div key={field.name}>
           {field.type === 'text' && (
-            <input {...register(field.name)} type="text" />
+            <input {...register(field.name,{ defaultValue: field.defaultValue })} type="text" />
           )}
           {field.type === 'select' && (
-            <select {...register(field.name)}>
+            <select {...register(field.name,{ defaultValue: field.defaultValue })}>
               {field.options.map(option => (
                 <option key={option} value={option}>{option}</option>
               ))}
