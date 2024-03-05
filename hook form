@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 
 function MyForm() {
-  const { register, watch } = useForm();
+  const { register,handleSubmit, watch } = useForm();
   const fields = [
     { name: 'textInput', type: 'text' },
     { name: 'dropdown', type: 'select', options: ['Option 1', 'Option 2', 'Option 3'] },
