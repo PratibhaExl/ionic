@@ -1,0 +1,70 @@
+loader using mui hook
+
+
+For creating a reusable hook that manages the display of a Material-UI (MUI) loader in a React application, you'll first need to ensure that you have the Material-UI library installed in your project. If you haven't installed it yet, you can add it by running:
+
+bash
+Copy code
+npm install @mui/material @emotion/react @emotion/styled
+Or, if you're using Yarn:
+
+bash
+Copy code
+yarn add @mui/material @emotion/react @emotion/styled
+Once you have MUI installed, you can proceed to create the hook.
+
+Step 1: Define the Hook
+Create a new file for your hook, e.g., useLoader.ts. This hook will manage a loading state that can be toggled to show or hide an MUI loader component.
+
+typescript
+Copy code
+import { useState } from 'react';
+
+type UseLoaderReturn = {
+  loading: boolean;
+  showLoader: () => void;
+  hideLoader: () => void;
+};
+
+export const useLoader = (): UseLoaderReturn => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const showLoader = () => setLoading(true);
+  const hideLoader = () => setLoading(false);
+
+  return { loading, showLoader, hideLoader };
+};
+Step 2: Use the Hook in a Component with MUI CircularProgress
+Now, let's create a simple React component that uses this hook to control the visibility of an MUI CircularProgress component.
+
+Create a new file for your component, e.g., LoaderComponent.tsx.
+
+tsx
+Copy code
+import React from 'react';
+import { useLoader } from './useLoader';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
+export const LoaderComponent: React.FC = () => {
+  const { loading, showLoader, hideLoader } = useLoader();
+
+  return (
+    <div>
+      {loading && (
+        <Box display="flex" justifyContent="center">
+          <CircularProgress />
+        </Box>
+      )}
+      <button onClick={showLoader}>Show Loader</button>
+      <button onClick={hideLoader}>Hide Loader</button>
+    </div>
+  );
+};
+In this component:
+
+A CircularProgress component from MUI is displayed when the loading state is true.
+Two buttons allow the user to toggle the loader's visibility by invoking showLoader and hideLoader functions provided by the useLoader hook.
+This setup encapsulates the loader's visibility logic within the custom hook, making it easy to reuse the loading functionality across your React application without duplicating state management code. You can integrate the LoaderComponent wherever you need a loading indicator, providing a consistent user experience with minimal effort.
+
+
