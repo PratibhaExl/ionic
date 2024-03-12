@@ -1,97 +1,78 @@
-To create a dynamic component using Material-UI's Slide and Dialog components in React.js, you can follow these steps:
 
-Install Material-UI: If you haven't already installed Material-UI, you can do so using npm or yarn:
+Creating a dynamic Slide Alert in Material-UI (now MUI) version 5.15.10 using hooks can be quite straightforward. MUI's Snackbar component works well for alert messages, and you can use it in combination with the Slide transition component to make alerts slide in and out. Here’s a simple example on how to dynamically create a slide alert using a custom hook:
+
+First, ensure you have MUI installed in your project. If you haven't installed it yet, you can do so by running:
+
 bash
 Copy code
 npm install @mui/material @emotion/react @emotion/styled
-or
+Next, let's create a custom hook useSlideAlert to manage the alert's visibility and content:
 
-bash
+javascript
 Copy code
-yarn add @mui/material @emotion/react @emotion/styled
-Create the Dynamic Slide Dialog Component: Below is an example of a dynamic Slide Dialog component that takes props for title, content, open state, and onClose handler:
-jsx
-Copy code
-import React from 'react';
-import Dialog from '@mui/material/Dialog';
+import React, { useState, useCallback } from 'react';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import Slide from '@mui/material/Slide';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+// Helper function for the slide transition
+function SlideTransition(props) {
+  return <Slide {...props} direction="up" />;
+}
+
+// Custom Alert component for easier usage
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const DynamicSlideDialog = ({ title, content, open, onClose }) => {
-  return (
-    <Dialog
-      fullScreen
-      open={open}
-      onClose={onClose}
-      TransitionComponent={Transition}
-    >
-      <AppBar sx={{ position: 'relative' }}>
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={onClose}
-            aria-label="close"
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ ml: 2, flex: 1 }}>
-            {title}
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Typography variant="h6" align="center" sx={{ mt: 10 }}>
-        {content}
-      </Typography>
-    </Dialog>
+// Custom hook to use the slide alert
+export function useSlideAlert() {
+  const [open, setOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    message: '',
+    severity: 'info', // error, warning, info, success
+  });
+
+  const showAlert = useCallback((message, severity = 'info') => {
+    setAlertConfig({ message, severity });
+    setOpen(true);
+  }, []);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const renderAlert = () => (
+    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} TransitionComponent={SlideTransition}>
+      <Alert onClose={handleClose} severity={alertConfig.severity} sx={{ width: '100%' }}>
+        {alertConfig.message}
+      </Alert>
+    </Snackbar>
   );
-};
 
-export default DynamicSlideDialog;
-Using the Component: You can now use the DynamicSlideDialog component in your application and control its visibility using the open and onClose props.
-jsx
+  return { showAlert, renderAlert };
+}
+You can then use this hook in your component like so:
+
+javascript
 Copy code
-import React, { useState } from 'react';
+import React from 'react';
 import Button from '@mui/material/Button';
-import DynamicSlideDialog from './DynamicSlideDialog';
+import { useSlideAlert } from './path-to-your-hook/useSlideAlert'; // Adjust the path as necessary
 
-const App = () => {
-  const [openDialog, setOpenDialog] = useState(false);
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
+function YourComponent() {
+  const { showAlert, renderAlert } = useSlideAlert();
 
   return (
     <div>
-      <Button variant="contained" onClick={handleOpenDialog}>
-        Open Dialog
-      </Button>
-      <DynamicSlideDialog
-        title="Dynamic Slide Dialog"
-        content="This is a dynamic Slide Dialog component."
-        open={openDialog}
-        onClose={handleCloseDialog}
-      />
+      <Button onClick={() => showAlert('This is a success message!', 'success')}>Show Success Alert</Button>
+      {renderAlert()}
     </div>
   );
-};
+}
 
-export default App;
-This setup will allow you to create and control dynamic Slide Dialog components in your React.js application using Material-UI. Adjust the styling and content of the dialog as needed to fit your requirements.
-
-
-
-
+export default YourComponent;
+In this setup, useSlideAlert provides you with a showAlert function to display the alert and a renderAlert function that you need to include in your component's return statement to actually render the alert. The showAlert function takes a message and an optional severity level (by default 'info') as arguments.
