@@ -1,78 +1,102 @@
+dialog
 
-Creating a dynamic Slide Alert in Material-UI (now MUI) version 5.15.10 using hooks can be quite straightforward. MUI's Snackbar component works well for alert messages, and you can use it in combination with the Slide transition component to make alerts slide in and out. Here’s a simple example on how to dynamically create a slide alert using a custom hook:
 
-First, ensure you have MUI installed in your project. If you haven't installed it yet, you can do so by running:
+To dynamically create and manage a Slide Dialog in a React component using MUI (Material-UI) version 5.15.10 with TypeScript, you can leverage React hooks. Here's a step-by-step example of how to achieve this:
+
+Step 1: Installation
+First, ensure you have MUI installed in your project. If not, you can install it using npm or yarn:
 
 bash
 Copy code
 npm install @mui/material @emotion/react @emotion/styled
-Next, let's create a custom hook useSlideAlert to manage the alert's visibility and content:
+or
 
-javascript
+bash
 Copy code
-import React, { useState, useCallback } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-import Slide from '@mui/material/Slide';
+yarn add @mui/material @emotion/react @emotion/styled
+Step 2: Create a Custom Hook for the Dialog
+We'll create a custom hook (useSlideDialog) to manage the open state of the dialog. This hook will provide methods to open and close the dialog, as well as the current state.
 
-// Helper function for the slide transition
-function SlideTransition(props) {
-  return <Slide {...props} direction="up" />;
+tsx
+Copy code
+// useSlideDialog.ts
+import { useState } from 'react';
+
+interface UseSlideDialogReturnType {
+  isOpen: boolean;
+  openDialog: () => void;
+  closeDialog: () => void;
 }
 
-// Custom Alert component for easier usage
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+export const useSlideDialog = (): UseSlideDialogReturnType => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const openDialog = () => setIsOpen(true);
+  const closeDialog = () => setIsOpen(false);
+
+  return { isOpen, openDialog, closeDialog };
+};
+Step 3: Create the Slide Dialog Component
+Now, let's create a SlideDialog component that uses the useSlideDialog hook. This component will render the dialog content and utilize the MUI Dialog component for the sliding effect.
+
+tsx
+Copy code
+// SlideDialog.tsx
+import React from 'react';
+import Dialog from '@mui/material/Dialog';
+import Slide from '@mui/material/Slide';
+import { TransitionProps } from '@mui/material/transitions';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
 });
 
-// Custom hook to use the slide alert
-export function useSlideAlert() {
-  const [open, setOpen] = useState(false);
-  const [alertConfig, setAlertConfig] = useState({
-    message: '',
-    severity: 'info', // error, warning, info, success
-  });
-
-  const showAlert = useCallback((message, severity = 'info') => {
-    setAlertConfig({ message, severity });
-    setOpen(true);
-  }, []);
-
-  const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setOpen(false);
-  };
-
-  const renderAlert = () => (
-    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} TransitionComponent={SlideTransition}>
-      <Alert onClose={handleClose} severity={alertConfig.severity} sx={{ width: '100%' }}>
-        {alertConfig.message}
-      </Alert>
-    </Snackbar>
-  );
-
-  return { showAlert, renderAlert };
+interface SlideDialogProps {
+  isOpen: boolean;
+  handleClose: () => void;
 }
-You can then use this hook in your component like so:
 
-javascript
+export const SlideDialog: React.FC<SlideDialogProps> = ({ isOpen, handleClose }) => {
+  return (
+    <Dialog
+      open={isOpen}
+      TransitionComponent={Transition}
+      keepMounted
+      onClose={handleClose}
+      aria-labelledby="alert-dialog-slide-title"
+      aria-describedby="alert-dialog-slide-description"
+    >
+      {/* Your dialog content here */}
+      <div>Your dialog content goes here.</div>
+    </Dialog>
+  );
+};
+Step 4: Use the Slide Dialog in a Component
+Finally, use both the custom hook and the SlideDialog component in a parent component.
+
+tsx
 Copy code
+// App.tsx
 import React from 'react';
 import Button from '@mui/material/Button';
-import { useSlideAlert } from './path-to-your-hook/useSlideAlert'; // Adjust the path as necessary
+import { useSlideDialog } from './useSlideDialog';
+import { SlideDialog } from './SlideDialog';
 
-function YourComponent() {
-  const { showAlert, renderAlert } = useSlideAlert();
+export const App: React.FC = () => {
+  const { isOpen, openDialog, closeDialog } = useSlideDialog();
 
   return (
     <div>
-      <Button onClick={() => showAlert('This is a success message!', 'success')}>Show Success Alert</Button>
-      {renderAlert()}
+      <Button variant="outlined" onClick={openDialog}>
+        Open Slide Dialog
+      </Button>
+      <SlideDialog isOpen={isOpen} handleClose={closeDialog} />
     </div>
   );
-}
-
-export default YourComponent;
-In this setup, useSlideAlert provides you with a showAlert function to display the alert and a renderAlert function that you need to include in your component's return statement to actually render the alert. The showAlert function takes a message and an optional severity level (by default 'info') as arguments.
+};
+In this setup, the App component contains a button to trigger the dialog. Clicking the button calls openDialog from the useSlideDialog hook, which updates the state and causes the dialog to open. The SlideDialog component receives props to control its visibility and a method to close it, encapsulating its functionality and allowing for reuse across your application.
