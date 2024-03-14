@@ -1,3 +1,106 @@
+
+/////1
+
+
+import React, { useState } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { DateTime } from 'luxon';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+
+// Use luxon for date formatting
+const localizer = momentLocalizer(DateTime);
+
+interface Event {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+}
+
+const Scheduler: React.FC = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [newEvent, setNewEvent] = useState<Event>({ id: 0, title: '', start: new Date(), end: new Date() });
+
+  const handleSelectEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedEvent(null);
+    setNewEvent({ id: 0, title: '', start: new Date(), end: new Date() });
+  };
+
+  const handleUpdateEvent = () => {
+    if (selectedEvent) {
+      const updatedEvents = events.map((event) =>
+        event.id === selectedEvent.id ? { ...event, title: newEvent.title } : event
+      );
+      setEvents(updatedEvents);
+      handleCloseDialog();
+    }
+  };
+
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      const updatedEvents = events.filter((event) => event.id !== selectedEvent.id);
+      setEvents(updatedEvents);
+      handleCloseDialog();
+    }
+  };
+
+  const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
+    setNewEvent({ id: events.length + 1, title: '', start, end });
+    setDialogOpen(true);
+  };
+
+  return (
+    <div style={{ height: '800px' }}>
+      <Calendar
+        localizer={localizer}
+        events={events}
+        views={['month', 'week', 'day']}
+        onSelectEvent={handleSelectEvent}
+        onSelectSlot={handleSelectSlot}
+        selectable
+      />
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>{selectedEvent ? 'Update Event' : 'Add Event'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Event Title"
+            value={selectedEvent ? newEvent.title : newEvent.title}
+            onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          {selectedEvent && (
+            <Button onClick={handleDeleteEvent} color="error">
+              Delete
+            </Button>
+          )}
+          <Button onClick={handleUpdateEvent} variant="contained" color="primary">
+            {selectedEvent ? 'Update' : 'Add'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Scheduler;
+
+
+
+
+//////////////2/ new session 
+
 To implement a feature that displays daily, weekly, and monthly views of blocked meetings for users identified by email IDs using the React Big Calendar, you'll first need to ensure you have the react-big-calendar library along with its dependencies installed. The library uses moment or any other date handling library (luxon, date-fns) for date operations, but we'll use moment for this example for its simplicity and popularity.
 
 First, install the necessary packages:
