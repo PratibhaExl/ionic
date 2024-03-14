@@ -1,3 +1,119 @@
+///error fixes
+
+
+The error "datetime cannot be invoked without new object.browserTZOffset" typically occurs when you try to use a method directly on the DateTime object without instantiating it with the 'new' keyword. This might happen if you're trying to call a method like .toFormat() or .toLocaleString() directly on the DateTime object without creating an instance of it first.
+
+In the provided code, this error could be due to the way Luxon's DateTime object is used within the react-big-calendar library. To resolve this issue, you can ensure that Luxon's DateTime objects are correctly instantiated before using them.
+
+Here's a modified version of the Scheduler component to fix this issue:
+
+tsx
+Copy code
+import React, { useState } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { DateTime } from 'luxon';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+
+// Use luxon for date formatting
+const localizer = momentLocalizer(DateTime);
+
+interface Event {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
+}
+
+const Scheduler: React.FC = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+  const [newEvent, setNewEvent] = useState<Event>({ id: 0, title: '', start: new Date(), end: new Date() });
+
+  const handleSelectEvent = (event: Event) => {
+    setSelectedEvent(event);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedEvent(null);
+    setNewEvent({ id: 0, title: '', start: new Date(), end: new Date() });
+  };
+
+  const handleUpdateEvent = () => {
+    if (selectedEvent) {
+      const updatedEvents = events.map((event) =>
+        event.id === selectedEvent.id ? { ...event, title: newEvent.title } : event
+      );
+      setEvents(updatedEvents);
+      handleCloseDialog();
+    }
+  };
+
+  const handleDeleteEvent = () => {
+    if (selectedEvent) {
+      const updatedEvents = events.filter((event) => event.id !== selectedEvent.id);
+      setEvents(updatedEvents);
+      handleCloseDialog();
+    }
+  };
+
+  const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
+    setNewEvent({ id: events.length + 1, title: '', start, end });
+    setDialogOpen(true);
+  };
+
+  return (
+    <div style={{ height: '800px' }}>
+      <Calendar
+        localizer={localizer}
+        events={events.map(event => ({
+          ...event,
+          start: DateTime.fromJSDate(event.start),
+          end: DateTime.fromJSDate(event.end)
+        }))}
+        views={['month', 'week', 'day']}
+        onSelectEvent={handleSelectEvent}
+        onSelectSlot={handleSelectSlot}
+        selectable
+      />
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>{selectedEvent ? 'Update Event' : 'Add Event'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Event Title"
+            value={selectedEvent ? newEvent.title : newEvent.title}
+            onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          {selectedEvent && (
+            <Button onClick={handleDeleteEvent} color="error">
+              Delete
+            </Button>
+          )}
+          <Button onClick={handleUpdateEvent} variant="contained" color="primary">
+            {selectedEvent ? 'Update' : 'Add'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+};
+
+export default Scheduler;
+In this modification, before passing events to the Calendar component, each event's start and end properties are converted from JavaScript Date objects to Luxon's DateTime objects using DateTime.fromJSDate(). This ensures that the DateTime objects are correctly instantiated before being used within the react-big-calendar component, preventing the "datetime cannot be invoked without new object.browserTZOffset" error.
+
+
+
+
+
+
+
 
 /////1
 
