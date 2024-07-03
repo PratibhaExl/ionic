@@ -1,0 +1,93 @@
+//////slidealert
+
+import React, { useState } from 'react';
+import './SlideAlertDialog.css'; // Import CSS for styling
+
+const SlideAlertDialog = ({ isVisible, message, onClose }) => {
+  const [showDialog, setShowDialog] = useState(isVisible);
+
+  const handleClose = () => {
+    setShowDialog(false);
+    onClose && onClose();
+  };
+
+  return (
+    <div className={`slide-alert-dialog ${showDialog ? 'show' : 'hide'}`}>
+      <div className="slide-alert-content">
+        <p>{message}</p>
+        <button onClick={handleClose}>Close</button>
+      </div>
+    </div>
+  );
+};
+
+export default SlideAlertDialog;
+
+
+//***css SlideAlertDialog.css
+.slide-alert-dialog {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(100%);
+}
+
+.slide-alert-dialog.show {
+  transform: translateY(0);
+}
+
+.slide-alert-dialog.hide {
+  transform: translateY(100%);
+}
+
+.slide-alert-content {
+  padding: 20px;
+}
+
+.slide-alert-content button {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  outline: none;
+}
+
+.slide-alert-content button:hover {
+  background-color: #0056b3;
+}
+
+//********** uses 
+import React, { useState } from 'react';
+import SlideAlertDialog from './SlideAlertDialog';
+
+const App = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  const handleShowDialog = () => {
+    setIsVisible(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsVisible(false);
+  };
+
+  return (
+    <div>
+      <button onClick={handleShowDialog}>Show Alert</button>
+      <SlideAlertDialog
+        isVisible={isVisible}
+        message="This is a slide alert dialog."
+        onClose={handleCloseDialog}
+      />
+    </div>
+  );
+};
+
+export default App;
+
+

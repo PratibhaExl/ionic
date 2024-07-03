@@ -1,0 +1,27 @@
++++++++++++ use state put it top of your function-===============
+const [loading, setLoading] = useState(true);
+
+
+
+
+********************** this is your component **********************
+import React from 'react';
+const Spinner = () => {
+  return (
+    <div className="spinner">
+      {/* Spinner animation */}
+      <div className="spinner-animation"></div>
+    </div>
+  );
+};
+export default Spinner;
+************************** create useeffect **********************
+useEffect(()=>{
+    setLoading(true);
+setTimeout(()=>{
+    setLoading(false);
+},3000)
+},[])
+
+************************use it there where you want to show loader ***********************
+<>{loading ? <Spinner />: <your screen contetnt> </>

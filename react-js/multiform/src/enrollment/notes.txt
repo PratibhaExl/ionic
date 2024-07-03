@@ -1,0 +1,109 @@
+
+import React, { useEffect, useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { Grid } from '@mui/material';
+import Plan from './Plan';
+import DynamicFormField, { FieldConfig } from './DynamicFormField';
+
+const fetchFieldConfigs = async () => {
+  // Simulate an API call
+  return new Promise<FieldConfig[]>((resolve) => {
+    setTimeout(() => {
+      resolve([
+        {
+          type: 'text',
+          name: 'firstName',
+          label: 'First Name',
+          rules: { required: 'First Name is required' },
+          defaultValue: 'John'
+        },
+        {
+          type: 'select',
+          name: 'country',
+          label: 'Country',
+          options: [
+            { value: 'usa', label: 'USA' },
+            { value: 'canada', label: 'Canada' },
+            { value: 'uk', label: 'UK' }
+          ],
+          defaultValue: 'usa'
+        },
+        {
+          type: 'radio',
+          name: 'gender',
+          label: 'Gender',
+          options: [
+            { value: 'male', label: 'Male' },
+            { value: 'female', label: 'Female' }
+          ],
+          defaultValue: 'male'
+        },
+        {
+          type: 'date',
+          name: 'dob',
+          label: 'Date of Birth',
+          rules: { required: 'Date of Birth is required' },
+          defaultValue: '01/01/2000'
+        }
+      ]);
+    }, 1000);
+  });
+};
+
+const Enroll = () => {
+  const methods = useForm();
+  const [fieldConfigs, setFieldConfigs] = useState<FieldConfig[]>([]);
+
+  useEffect(() => {
+    const getFieldConfigs = async () => {
+      const configs = await fetchFieldConfigs();
+      // Update country options if necessary
+      const updatedConfigs = configs.map(config => {
+        if (config.name === 'country' && config.type === 'select') {
+          return {
+            ...config,
+            options: [
+              ...config.options,
+              { value: 'australia', label: 'Australia' },
+              { value: 'india', label: 'India' }
+            ]
+          };
+        }
+        return config;
+      });
+      setFieldConfigs(updatedConfigs);
+    };
+
+    getFieldConfigs();
+  }, []);
+
+  const nextStep = async () => {
+    const isValid = await methods.trigger(); // Trigger validation
+    if (isValid) {
+      console.log(methods.getValues()); // Access form data if valid
+    } else {
+      console.log('Validation failed');
+    }
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <Grid container spacing={2}>
+        {fieldConfigs.length > 0 ? (
+          fieldConfigs.map((config, index) => (
+            <Grid item xs={12} key={index}>
+              <DynamicFormField fieldConfig={config} />
+            </Grid>
+          ))
+        ) : (
+          <p>Loading...</p>
+        )}
+        <Grid item xs={12}>
+          <button onClick={nextStep}>Next</button>
+        </Grid>
+      </Grid>
+    </FormProvider>
+  );
+};
+
+export default Enroll;

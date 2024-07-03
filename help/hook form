@@ -1,0 +1,40 @@
+import React from 'react';
+import { useForm } from 'react-hook-form';
+
+function MyForm() {
+  const { register,handleSubmit, watch } = useForm();
+  const fields = [
+    { name: 'textInput', type: 'text' },
+    { name: 'dropdown', type: 'select', options: ['Option 1', 'Option 2', 'Option 3'] },
+    // Add more fields as needed
+  ];
+
+  const watchedFields = watch(); // Get all watched fields
+  console.log('Watched fields:', watchedFields);
+
+  const onSubmit = data => {
+    console.log('Form data:', data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {fields.map(field => (
+        <div key={field.name}>
+          {field.type === 'text' && (
+            <input {...register(field.name,{ defaultValue: field.defaultValue })} type="text" />
+          )}
+          {field.type === 'select' && (
+            <select {...register(field.name,{ defaultValue: field.defaultValue })}>
+              {field.options.map(option => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+          )}
+        </div>
+      ))}
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+
+export default MyForm;

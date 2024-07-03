@@ -1,0 +1,168 @@
+
+
+To include in the design that the error message only shows if a field is touched and then left blank, we need to track the touched state of each field. This involves updating the Form and App components to handle this logic.
+
+Here's how you can achieve it:
+
+FormField Component:
+No changes needed here.
+
+jsx
+Copy code
+import React from 'react';
+import TextField from '@mui/material/TextField';
+
+const FormField = ({ id, label, value, handleChange, error, helperText }) => {
+  return (
+    <TextField
+      id={id}
+      label={label}
+      value={value}
+      onChange={(e) => handleChange(id, e.target.value)}
+      error={!!error}
+      helperText={helperText}
+      variant="outlined"
+      fullWidth
+      margin="normal"
+    />
+  );
+};
+
+export default FormField;
+Form Component:
+Add logic to track touched fields and only show errors for those fields.
+
+jsx
+Copy code
+import React, { useState, useEffect } from 'react';
+import FormField from './FormField';
+
+const Form = ({ fields, formData, setFormData, errors, setErrors, validate, touched, handleBlur }) => {
+  const handleChange = (fieldId, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldId]: value,
+    }));
+  };
+
+  useEffect(() => {
+    validate();
+  }, [formData]);
+
+  return (
+    <form>
+      {fields.map((field) => (
+        <FormField
+          key={field.Id}
+          id={field.Id}
+          label={field.FieldName}
+          value={formData[field.Id]}
+          handleChange={handleChange}
+          error={touched[field.Id] && !!errors[field.Id]}
+          helperText={touched[field.Id] && errors[field.Id]}
+          onBlur={() => handleBlur(field.Id)}
+        />
+      ))}
+    </form>
+  );
+};
+
+export default Form;
+App Component:
+Handle the touched state and validation in the parent component.
+
+jsx
+Copy code
+import React, { useState } from 'react';
+import Form from './Form';
+import Button from '@mui/material/Button';
+
+const fields = [
+  {
+    Id: 'firstname',
+    FieldName: 'First Name',
+  },
+  {
+    Id: 'lastname',
+    FieldName: 'Last Name',
+  },
+  // Add more fields as needed
+];
+
+const App = () => {
+  const [formData, setFormData] = useState(
+    fields.reduce((acc, field) => {
+      acc[field.Id] = '';
+      return acc;
+    }, {})
+  );
+
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const handleBlur = (fieldId) => {
+    setTouched((prevTouched) => ({
+      ...prevTouched,
+      [fieldId]: true,
+    }));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+    fields.forEach((field) => {
+      if (!formData[field.Id]) {
+        newErrors[field.Id] = `${field.FieldName} is required`;
+      }
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setTouched(fields.reduce((acc, field) => {
+      acc[field.Id] = true;
+      return acc;
+    }, {}));
+    if (validate()) {
+      console.log('Form data submitted:', formData);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Reusable Form with Validation</h1>
+      <Form
+        fields={fields}
+        formData={formData}
+        setFormData={setFormData}
+        errors={errors}
+        setErrors={setErrors}
+        validate={validate}
+        touched={touched}
+        handleBlur={handleBlur}
+      />
+      <Button onClick={handleSubmit} variant="contained" color="primary">
+        Submit
+      </Button>
+    </div>
+  );
+};
+
+export default App;
+Explanation:
+FormField Component:
+
+No changes needed, it still renders a TextField.
+Form Component:
+
+Accepts additional props: touched and handleBlur.
+Passes handleBlur to FormField, which sets the field as touched when it loses focus.
+Shows errors only if the field is touched and has an error.
+App Component:
+
+Manages touched state to track which fields have been interacted with.
+handleBlur updates the touched state for a field when it loses focus.
+handleSubmit sets all fields as touched before validating to ensure errors are shown if fields are empty.
+Passes touched and handleBlur to the Form component.
+This approach ensures error messages are only shown after a user interacts with a field, providing a better user experience.

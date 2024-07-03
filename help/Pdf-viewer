@@ -1,0 +1,588 @@
+For a robust PDF viewing experience in React, you can use the react-pdf library along with Material-UI for button styling. Here's how you can integrate it into your component:
+
+First, install the required packages:
+
+bash
+Copy code
+npm install @react-pdf-viewer/core @react-pdf-viewer/default-layout
+Then, create your DocumentViewer component:
+
+tsx
+Copy code
+import React, { useState } from 'react';
+import { Button, Grid } from '@mui/material';
+import { Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+
+const DocumentViewer: React.FC = () => {
+  const [numPages, setNumPages] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(0);
+
+  const { Plugin: DefaultLayoutPlugin } = defaultLayoutPlugin;
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={3}>
+        {/* Buttons on the left side */}
+        <Button variant="contained" color="primary" onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 0}>
+          Previous Page
+        </Button>
+        <Button variant="contained" color="primary" onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === numPages - 1}>
+          Next Page
+        </Button>
+        <Button variant="contained" color="primary" onClick={() => console.log('Button clicked')}>
+          Custom Action
+        </Button>
+      </Grid>
+      <Grid item xs={9}>
+        {/* PDF Viewer */}
+        <div style={{ height: '800px' }}>
+          <Viewer
+            fileUrl="your_pdf_file_url_here.pdf"
+            plugins={[defaultLayoutPluginInstance]}
+            onDocumentLoadSuccess={({ numPages }) => setNumPages(numPages)}
+            page={currentPage}
+          />
+        </div>
+      </Grid>
+    </Grid>
+  );
+};
+
+export default DocumentViewer;
+In this component:
+
+We use the Viewer component from @react-pdf-viewer/core to display the PDF.
+The buttons on the left side allow navigation through the pages of the document.
+You can easily add more buttons or customize their actions as needed.
+Replace "your_pdf_file_url_here.pdf" with the URL of your PDF file.
+The onDocumentLoadSuccess callback updates the state with the total number of pages in the document.
+Make sure to adjust the height of the container div to fit your layout.
+This setup provides a flexible and interactive PDF viewing experience with navigation buttons on the left side and the PDF itself on the right side.
+
+
+
+
+
+
+***** custom design
+
+To design a custom PDF viewer that supports dynamic and static data in React.js, you can use the react-pdf library along with custom components for displaying additional data. Here's how you can achieve this:
+
+First, install the required packages:
+
+bash
+Copy code
+npm install @react-pdf-viewer/core @react-pdf-viewer/default-layout
+Then, create your custom DocumentViewer component:
+
+tsx
+Copy code
+import React from 'react';
+import { Document, Page, pdfjs } from 'react-pdf';
+import { Button } from '@mui/material';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+interface CustomDocumentViewerProps {
+  pdfData: string; // Dynamic PDF data
+}
+
+const CustomDocumentViewer: React.FC<CustomDocumentViewerProps> = ({ pdfData }) => {
+  const staticData = 'Your static data here'; // Static data
+
+  return (
+    <div>
+      {/* Display static data */}
+      <div>{staticData}</div>
+
+      {/* Display PDF */}
+      <Document file={pdfData}>
+        <Page pageNumber={1} />
+      </Document>
+
+      {/* Additional custom buttons */}
+      <Button variant="contained" color="primary" onClick={() => console.log('Custom action')}>
+        Custom Action
+      </Button>
+    </div>
+  );
+};
+
+
+
+
+
+***†******* download
+
+
+To create a custom PDF design using Material-UI in React.js and pass JSON data to generate the PDF, you can use the react-pdf library along with Material-UI components for styling and layout. Here's how you can achieve this:
+
+First, install the required packages:
+
+bash
+Copy code
+npm install @react-pdf/renderer @mui/material
+Then, create your custom PDF component:
+
+tsx
+Copy code
+import React from 'react';
+import { Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer';
+import { Button } from '@mui/material';
+
+// Define styles for PDF
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
+    padding: 20,
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+  heading: {
+    fontSize: 24,
+    marginBottom: 10,
+  },
+  content: {
+    fontSize: 12,
+    marginBottom: 5,
+  },
+});
+
+// Custom PDF component
+const CustomPDF = ({ jsonData }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <View style={styles.section}>
+        <Text style={styles.heading}>PDF Document</Text>
+        {/* Render JSON data */}
+        {jsonData.map((item, index) => (
+          <View key={index}>
+            <Text style={styles.content}>Name: {item.name}</Text>
+            <Text style={styles.content}>Age: {item.age}</Text>
+            <Text style={styles.content}>Address: {item.address}</Text>
+          </View>
+        ))}
+      </View>
+    </Page>
+  </Document>
+);
+
+// Usage example
+const MyPDFViewer = ({ jsonData }) => {
+  const handleDownloadPDF = () => {
+    const blob = new Blob([<CustomPDF jsonData={jsonData} />], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div>
+      <PDFViewer width="1000" height="600">
+        <CustomPDF jsonData={jsonData} />
+      </PDFViewer>
+      <Button variant="contained" color="primary" onClick={handleDownloadPDF}>Download PDF</Button>
+    </div>
+  );
+};
+
+export default MyPDFViewer;
+In this example:
+
+The CustomPDF component renders the PDF content using the Document, Page, Text, and View components from @react-pdf/renderer.
+JSON data is passed to the CustomPDF component, which is then rendered inside the PDF.
+The MyPDFViewer component wraps the CustomPDF component and provides a button to download the generated PDF.
+When the button is clicked, the PDF is generated dynamically using the provided JSON data and downloaded by the user.
+You can use the MyPDFViewer component in your application by passing JSON data as a prop.
+
+
+
+
+****** modal
+
+Step 1: Creating the Modal Component
+Here's how you could implement the Modal.tsx:
+
+tsx
+Copy code
+// src/components/Modal.tsx
+import React from 'react';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    }}>
+      <div style={{
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      }}>
+        <button onClick={onClose} style={{ marginLeft: 'auto', display: 'block' }}>Close</button>
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default Modal;
+Step 2: Content Component
+This is an example content component you might want to load into the modal.
+
+tsx
+Copy code
+// src/components/ContentPage.tsx
+import React from 'react';
+
+const ContentPage: React.FC = () => {
+  return (
+    <div>
+      <h1>Page Title</h1>
+      <p>This is the content of the page that will appear in the modal.</p>
+    </div>
+  );
+};
+
+export default ContentPage;
+Step 3: Main App Component with Modal Usage
+Finally, integrate the modal into your main application component (App.tsx), using state to control its visibility:
+
+tsx
+Copy code
+// src/App.tsx
+import React, { useState } from 'react';
+import Modal from './components/Modal';
+import ContentPage from './components/ContentPage';
+
+const App: React.FC = () => {
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setModalOpen(true)}>Open Modal</button>
+      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+        <ContentPage />
+      </Modal>
+    </div>
+  );
+};
+
+export default App;
+Explanation
+Modal.tsx defines a modal that takes in props for open state, close functionality, and children to render inside it.
+ContentPage.tsx is the page or component content you want to show inside the modal.
+App.tsx uses the modal and controls its visibility through state. It also uses a button to trigger the modal open action.
+
+
+
+
+
+export default CustomDocumentViewer;
+In this component:
+
+The CustomDocumentViewer component takes pdfData as a prop for dynamic PDF data.
+staticData represents any static data you want to display alongside the PDF.
+The PDF is displayed using the Document and Page components from react-pdf.
+Additional custom buttons or components can be added as needed.
+Replace "Your static data here" with the actual static data you want to display.
+Replace "//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js" with the appropriate PDF worker URL.
+This setup allows you to design a custom PDF viewer that supports both dynamic and static data in React.js. You can customize the layout and components according to your requirements.
+
+
+
+***********
+
+
+To create a PDF and display it in a React application using a Blob URL, you can use a combination of libraries such as pdf-lib for PDF generation and react-pdf for rendering the PDF. Here's how you can do it:
+
+Install Required Packages:
+Make sure you have installed the necessary packages:
+bash
+Copy code
+npm install @react-pdf/renderer pdf-lib
+Create a Component to Generate and Display PDF:
+Here's a basic example of how you can create a PDF and display it in a React component:
+tsx
+Copy code
+import React, { useState } from 'react';
+import { PDFDocument, rgb } from 'pdf-lib';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+
+const GeneratePDF: React.FC = () => {
+  const [pdfURL, setPdfURL] = useState<string | null>(null);
+
+  const generatePDF = async () => {
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage();
+    const { width, height } = page.getSize();
+    const fontSize = 30;
+
+    const helveticaFont = await pdfDoc.embedFont(PDFDocument.Font.Helvetica);
+
+    page.drawText('Hello World!', {
+      x: 50,
+      y: height - 4 * fontSize,
+      size: fontSize,
+      font: helveticaFont,
+      color: rgb(0, 0.53, 0.71),
+    });
+
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    setPdfURL(url);
+  };
+
+  return (
+    <div>
+      <button onClick={generatePDF}>Generate PDF</button>
+      {pdfURL && (
+        <embed src={pdfURL} type="application/pdf" width="100%" height="600px" />
+      )}
+    </div>
+  );
+};
+
+export default GeneratePDF;
+This component will generate a PDF containing the text "Hello World!" when the button is clicked and display it using the embed tag.
+Styling the PDF:
+You can use the @react-pdf/renderer library to style your PDF. In the example above, we've used basic styling to add text to the PDF. You can explore more advanced styling options in the library's documentation.
+Rendering the Component:
+
+
+
+
+
+
+
+********** modal 
+
+
+
+First, ensure that you have a modal root div in your public/index.html file:
+
+html
+Copy code
+<!-- Add this in your index.html in the body tag -->
+<div id="modal-root"></div>
+Modal.tsx
+tsx
+Copy code
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const modalRoot = document.getElementById('modal-root') as HTMLElement;
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+  const el = document.createElement('div');
+
+  useEffect(() => {
+    modalRoot.appendChild(el);
+    return () => {
+      modalRoot.removeChild(el);
+    };
+  }, [el]);
+
+  if (!isOpen) return null;
+
+  return ReactDOM.createPortal(
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimmed background
+    }}>
+      <div style={{
+        position: 'relative',
+        padding: '20px',
+        width: '80%',
+        maxWidth: '600px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        <div style={{ alignSelf: 'flex-end' }}>
+          <button onClick={onClose}>&times;</button> {/* Close button */}
+        </div>
+        <div style={{ padding: '20px', backgroundColor: '#f9f9f9' }}>
+          {children} {/* Content area */}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+          <button onClick={onClose}>Close</button> {/* Footer button */}
+        </div>
+      </div>
+    </div>,
+    el
+  );
+};
+
+export default Modal;
+Usage Example
+Here’s how you might use this Modal component within another component:
+
+tsx
+Copy code
+import React, { useState } from 'react';
+import Modal from './Modal';
+
+const App: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <p>This is the modal content!</p>
+      </Modal>
+    </div>
+  );
+};
+
+export default App;
+Explanation
+Portal Use: The modal uses a React Portal to render the modal content into modal-root which is outside the regular DOM hierarchy of the parent component. This helps in managing proper layering and positioning of the modal above other content.
+Inline Styling: Styles are applied directly to elements for simplicity. For a production-level application, you would likely use a stylesheet or CSS-in-JS solution for better scalability and manageability.
+Lifecycle Management: The useEffect hook ensures that the div used for the portal is properly added and cleaned up from the modal-root.
+
+
+
+
+
+***** modal two 
+
+
+Modal.tsx
+tsx
+Copy code
+import React, { useEffect, useState } from 'react';
+import ReactDOM from 'react-dom';
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+  const [container] = useState(document.createElement('div'));
+
+  useEffect(() => {
+    // Add styles if necessary
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.zIndex = '1000'; // Ensure it's above other content
+
+    if (isOpen) {
+      document.body.appendChild(container);
+    }
+
+    return () => {
+      if (container.parentNode) {
+        document.body.removeChild(container);
+      }
+    };
+  }, [isOpen, container]);
+
+  if (!isOpen) return null;
+
+  return ReactDOM.createPortal(
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dimmed background
+    }}>
+      <div style={{
+        padding: '20px',
+        width: '80%',
+        maxWidth: '600px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}>
+        <div style={{ alignSelf: 'flex-end' }}>
+          <button onClick={onClose} style={{ cursor: 'pointer' }}>&times;</button> {/* Close button */}
+        </div>
+        <div style={{ padding: '20px', backgroundColor: '#f9f9f9' }}>
+          {children} {/* Content area */}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+          <button onClick={onClose}>Close</button> {/* Footer button */}
+        </div>
+      </div>
+    </div>,
+    container // Use the created container for the portal
+  );
+};
+
+export default Modal;
+Usage Example
+tsx
+Copy code
+import React, { useState } from 'react';
+import Modal from './Modal';
+
+const App: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button onClick={() => setIsOpen(true)}>Open Modal</button>
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <p>This is the modal content!</p>
+      </Modal>
+    </div>
+  );
+};
+
+export default App;
+
+
+
+

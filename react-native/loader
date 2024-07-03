@@ -1,0 +1,148 @@
+To create a dynamic hook for a Material-UI animated loader in React.js, you can use the Backdrop and CircularProgress components provided by Material-UI. Here's how you can create a custom hook for an animated loader:
+
+jsx
+Copy code
+import React, { useState } from 'react';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// Custom hook for handling loader state
+const useLoader = () => {
+  const [loading, setLoading] = useState(false);
+
+  // Function to show loader
+  const showLoader = () => {
+    setLoading(true);
+  };
+
+  // Function to hide loader
+  const hideLoader = () => {
+    setLoading(false);
+  };
+
+  // JSX for displaying loader
+  const Loader = () => (
+    <Backdrop open={loading} sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <CircularProgress color="inherit" />
+    </Backdrop>
+  );
+
+  return { loading, showLoader, hideLoader, Loader };
+};
+
+export default useLoader;
+Now you can use this custom hook in your components to manage the loader state and display it when necessary:
+
+jsx
+Copy code
+import React from 'react';
+import Button from '@mui/material/Button';
+import useLoader from './useLoader';
+
+const ExampleComponent = () => {
+  // Using the custom loader hook
+  const { loading, showLoader, hideLoader, Loader } = useLoader();
+
+  const fetchData = async () => {
+    showLoader(); // Show loader before fetching data
+    try {
+      // Fetch data from API
+      const response = await fetch('https://api.example.com/data');
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      hideLoader(); // Hide loader after fetching data (success or error)
+    }
+  };
+
+  return (
+    <div>
+      <Button variant="contained" onClick={fetchData} disabled={loading}>
+        {loading ? 'Loading...' : 'Fetch Data'}
+      </Button>
+      <Loader /> {/* Render the loader */}
+    </div>
+  );
+};
+
+export default ExampleComponent;
+In this example, the useLoader hook manages the state of the loader (loading), provides functions to show and hide the loader (showLoader and hideLoader), and renders the loader component (Loader). You can then use these features in your components to handle loading states and display the loader as needed.
+
+
+//************************************ mui 
+
+
+To create a dynamic hook for a Material-UI animated CircularProgressWithLabel loader in React.js, you can follow these steps:
+
+Install Material-UI: If you haven't already installed Material-UI, you can do so using npm or yarn:
+bash
+Copy code
+npm install @mui/material @emotion/react @emotion/styled
+or
+
+bash
+Copy code
+yarn add @mui/material @emotion/react @emotion/styled
+Create the Dynamic Loader Hook: Below is an example of a custom hook named useDynamicLoader that you can use to dynamically control the visibility of the CircularProgressWithLabel loader:
+jsx
+Copy code
+import React, { useState } from 'react';
+import CircularProgress, {
+  CircularProgressLabel,
+} from '@mui/material/CircularProgress';
+
+const useDynamicLoader = () => {
+  const [loading, setLoading] = useState(false);
+
+  const startLoading = () => {
+    setLoading(true);
+  };
+
+  const stopLoading = () => {
+    setLoading(false);
+  };
+
+  const Loader = () => {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: 20 }}>
+        <CircularProgress variant="determinate" value={100} size={24} />
+        <CircularProgressLabel>{loading ? 'Loading...' : ''}</CircularProgressLabel>
+      </div>
+    );
+  };
+
+  return { loading, startLoading, stopLoading, Loader };
+};
+
+export default useDynamicLoader;
+Using the Hook: You can now use the useDynamicLoader hook in your components to control the visibility of the loader.
+jsx
+Copy code
+import React from 'react';
+import useDynamicLoader from './useDynamicLoader';
+
+const MyComponent = () => {
+  const { loading, startLoading, stopLoading, Loader } = useDynamicLoader();
+
+  const handleClick = () => {
+    startLoading();
+    // Simulate asynchronous operation
+    setTimeout(() => {
+      stopLoading();
+    }, 3000);
+  };
+
+  return (
+    <div>
+      <button onClick={handleClick}>Start Loading</button>
+      {loading && <Loader />}
+      {/* Other content */}
+    </div>
+  );
+};
+
+export default MyComponent;
+This setup allows you to easily add a dynamic loader to any component in your React.js application and control its visibility using the loading, startLoading, and stopLoading functions provided by the useDynamicLoader hook. Adjust the styling and content of the loader as needed to fit your requirements.
+
