@@ -1,5 +1,6 @@
 import React from 'react';
 import DynamicFormField, { FieldConfig } from './DynamicFormField';
+import { Container, Grid } from '@mui/material';
 
 const fieldConfigs: FieldConfig[] = [
   {
@@ -42,12 +43,17 @@ const fieldConfigs: FieldConfig[] = [
 ];
 
 const Plan = () => (
-  <form>
-    {fieldConfigs.map((config, index) => (
+    <Container maxWidth="md">
+    <form>
+          <Grid container spacing={5} marginTop={5}>
+          {fieldConfigs.map((config, index) => (
       <DynamicFormField key={index} fieldConfig={config} />
     ))}
     {/* Other form elements and submit button */}
+    </Grid>
+   
   </form>
+  </Container>
 );
 
 export default Plan;

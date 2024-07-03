@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
-import { Grid } from '@mui/material';
+import { Container, Grid } from '@mui/material';
 import Plan from './plan';
 
 const Enroll = () => {
@@ -16,6 +16,8 @@ const Enroll = () => {
   };
 
   return (
+<Container maxWidth="md">
+  
     <FormProvider {...methods}>
       <Grid container spacing={2}>
         <Plan />
@@ -24,6 +26,9 @@ const Enroll = () => {
         </Grid>
       </Grid>
     </FormProvider>
+
+    </Container>
+
   );
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Controller, useFormContext, FieldErrors } from 'react-hook-form';
-import { TextField, FormControl, InputLabel, MenuItem, Select, FormControlLabel, FormLabel, Radio, RadioGroup, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants } from '@mui/material';
+import { TextField, FormControl, InputLabel, MenuItem, Select, FormControlLabel, FormLabel, Radio, RadioGroup, FilledTextFieldProps, OutlinedTextFieldProps, StandardTextFieldProps, TextFieldVariants, Grid } from '@mui/material';
 import { DatePicker } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
@@ -65,6 +65,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
   switch (fieldConfig.type) {
     case 'text':
       return (
+       <Grid xs={4}>
         <Controller
           name={fieldConfig.name}
           control={control}
@@ -85,9 +86,12 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
             />
           )}
         />
+        </Grid>
       );
     case 'select':
       return (
+        <Grid xs={4}>
+
         <FormControl variant="outlined" fullWidth error={!!errors[fieldConfig.name]}>
           <InputLabel>{fieldConfig.label}</InputLabel>
           <Controller
@@ -113,9 +117,12 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
             )}
           />
         </FormControl>
+</Grid>
       );
     case 'radio':
       return (
+        <Grid xs={4}>
+
         <FormControl component="fieldset" error={!!errors[fieldConfig.name]}>
           <FormLabel component="legend">{fieldConfig.label}</FormLabel>
           <Controller
@@ -138,9 +145,12 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
             )}
           />
         </FormControl>
+        </Grid>
       );
     case 'date':
       return (
+        <Grid xs={4}>
+
         <Controller
           name={fieldConfig.name}
           control={control}
@@ -163,6 +173,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
             </LocalizationProvider>
           )}
         />
+        </Grid>
       );
     default:
       return null;
