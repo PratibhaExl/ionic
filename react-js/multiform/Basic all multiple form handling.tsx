@@ -251,7 +251,7 @@ ponit 2- design update for dynamicformfields
 
 import React from 'react';
 import { Controller, useFormContext, FieldErrors } from 'react-hook-form';
-import { TextField, FormControl, InputLabel, MenuItem, Select, Grid } from '@mui/material';
+import { TextField, FormControl, InputLabel, MenuItem, Select, FormControlLabel, Radio, RadioGroup, Grid, FormLabel } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/lab';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import './DynamicFormField.css'; // Import the CSS file for custom styles
@@ -286,6 +286,7 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
     case 'text':
       return (
         <Grid item xs={4} className="dynamic-form-field">
+          <FormLabel className="field-label">{fieldConfig.label}</FormLabel>
           <Controller
             name={fieldConfig.name}
             control={control}
@@ -294,7 +295,6 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
             render={({ field }) => (
               <TextField
                 {...field}
-                label={fieldConfig.label}
                 error={!!errors[fieldConfig.name]}
                 helperText={getErrorMessage(errors, fieldConfig.name)}
                 variant="outlined"
@@ -311,8 +311,8 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
     case 'select':
       return (
         <Grid item xs={4} className="dynamic-form-field">
+          <FormLabel className="field-label">{fieldConfig.label}</FormLabel>
           <FormControl variant="outlined" fullWidth error={!!errors[fieldConfig.name]}>
-            <InputLabel>{fieldConfig.label}</InputLabel>
             <Controller
               name={fieldConfig.name}
               control={control}
@@ -321,7 +321,6 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
               render={({ field }) => (
                 <Select
                   {...field}
-                  label={fieldConfig.label}
                   onChange={(e) => {
                     field.onChange(e);
                     handleChange();
@@ -338,9 +337,32 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
           </FormControl>
         </Grid>
       );
+    case 'radio':
+      return (
+        <Grid item xs={4} className="dynamic-form-field">
+          <FormLabel className="field-label">{fieldConfig.label}</FormLabel>
+          <Controller
+            name={fieldConfig.name}
+            control={control}
+            defaultValue={fieldConfig.defaultValue || ''}
+            rules={fieldConfig.rules}
+            render={({ field }) => (
+              <RadioGroup {...field} onChange={(e) => {
+                field.onChange(e);
+                handleChange();
+              }}>
+                {fieldConfig.options.map(option => (
+                  <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+                ))}
+              </RadioGroup>
+            )}
+          />
+        </Grid>
+      );
     case 'date':
       return (
         <Grid item xs={4} className="dynamic-form-field">
+          <FormLabel className="field-label">{fieldConfig.label}</FormLabel>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Controller
               name={fieldConfig.name}
@@ -350,7 +372,6 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
               render={({ field }) => (
                 <DatePicker
                   {...field}
-                  label={fieldConfig.label}
                   onChange={(date) => {
                     field.onChange(date);
                     handleChange();
@@ -377,10 +398,14 @@ const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
 
 export default DynamicFormField;
 
-
-
 .dynamic-form-field {
   margin-bottom: 16px;
+}
+
+.field-label {
+  margin-bottom: 8px;
+  display: block;
+  font-weight: bold;
 }
 
 .dynamic-form-field .MuiFormControl-root {
@@ -400,7 +425,3 @@ export default DynamicFormField;
   background-color: white;
 }
 
-
-
-
-  
