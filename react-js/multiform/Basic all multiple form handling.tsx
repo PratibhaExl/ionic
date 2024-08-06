@@ -425,3 +425,29 @@ export default DynamicFormField;
   background-color: white;
 }
 
+
+point 3_ add case heading in DynamicFormFields 
+
+case 'heading':
+      return (
+        <Grid item xs={12} className="dynamic-form-field">
+          <Typography variant="h6" className="field-heading">{fieldConfig.label}</Typography>
+        </Grid>
+      );
+.field-label {
+  margin-bottom: 8px;
+  display: block;
+  font-weight: bold;
+}
+
+.field-heading {
+  margin-bottom: 16px;
+  font-weight: bold;
+}
+
+
+
+
+
+
+
