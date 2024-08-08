@@ -105,3 +105,52 @@ export const updateFieldConfig = (
 };
 
 
+
+
+ponit-  update immediately after given name in the array global function 
+
+
+export const insertFieldsAfter = (
+  fieldsArray: FieldConfig[], // The original array of fields
+  name: string,               // The name of the field after which to insert
+  fieldsToInsert: FieldConfig[], // The fields to insert
+  condition: boolean          // Condition to check whether to insert the fields
+): FieldConfig[] => {
+  // Find the index of the field with the specified name
+  const insertIndex = fieldsArray.findIndex(field => field.name === name);
+
+  if (insertIndex === -1) {
+    // If the field isn't found, return the original array unchanged
+    return fieldsArray;
+  }
+
+  // Create a new array with the fields inserted after the specified field
+  return [
+    ...fieldsArray.slice(0, insertIndex + 1), // Fields before and including the found field
+    ...(condition ? fieldsToInsert : []),     // Insert fields if the condition is true
+    ...fieldsArray.slice(insertIndex + 1)     // Fields after the inserted fields
+  ];
+};
+
+
+uses
+
+import { insertFieldsAfter } from './path-to-your-utils-file';
+
+// Assuming `showMailingContent` is a boolean that determines if mailing address fields should be shown
+const PLAN_ELIGIBILITY_FIELDS = insertFieldsAfter(
+  PLAN_ELIGIBILITY_FIELDS_ARRAY,   // The original array of fields
+  'MailingOption',                 // The field name after which to insert
+  MAILING_ADDRESS_CONTAINS_FIELDS_ARRAY, // The fields to insert
+  showMailingContent               // The condition to check
+);
+
+// Now, `PLAN_ELIGIBILITY_FIELDS` will contain the updated array with fields inserted if `showMailingContent` is true
+
+
+
+
+
+
+
+
