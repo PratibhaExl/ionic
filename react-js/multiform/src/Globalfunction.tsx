@@ -80,7 +80,6 @@ export default MSANCEnrollPlanEligibility;
 
 
 
-
 import { FieldConfig, TextConfig, SelectConfig, RadioConfig, DateConfig } from './formUtils';
 
 export const updateFieldConfig = (
@@ -90,21 +89,19 @@ export const updateFieldConfig = (
 ): FieldConfig[] => {
   return fields.map((field) => {
     if (field.name === name) {
-      // Ensure the type remains the same when updating the field
-      if (field.type === 'text' && typeof updates === 'object') {
+      // Explicitly handle each field type
+      if (field.type === 'text') {
         return { ...field, ...updates } as TextConfig;
-      } else if (field.type === 'select' && typeof updates === 'object') {
+      } else if (field.type === 'select') {
         return { ...field, ...updates } as SelectConfig;
-      } else if (field.type === 'radio' && typeof updates === 'object') {
+      } else if (field.type === 'radio') {
         return { ...field, ...updates } as RadioConfig;
-      } else if (field.type === 'date' && typeof updates === 'object') {
+      } else if (field.type === 'date') {
         return { ...field, ...updates } as DateConfig;
       }
     }
     return field;
   });
 };
-
-
 
 
