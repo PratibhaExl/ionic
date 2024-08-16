@@ -1,3 +1,5 @@
+
+
 CREATE PROCEDURE [dbo].[USP_TA_SEP_GetUpdateDetails_new] 
     @SEPEventID UNIQUEIDENTIFIER
 AS
@@ -47,18 +49,24 @@ BEGIN
     WHERE IsActive = 1 AND UniqueFileId = @fileid
     GROUP BY CONVERT(DATE, UpdatedDate);
 
-    -- Combine results and select final output
+    -- Combine results and select final output with the specified logic
     SELECT 
-        STRING_AGG(CONCAT(a.Purpose, ',', CAT.countyStr), ', ') AS Purpose,
-        CONVERT(DATE, a.InsertedDate) AS InsertedDate,
-        f.FileName,
-        f.FileAddedDate
+        COALESCE(STRING_AGG(DISTINCT CONCAT(a.Purpose, ',', CAT.countyStr), ', '), 
+                 f.FileName) AS Purpose,
+        COALESCE(CONVERT(DATE, a.InsertedDate), f.FileAddedDate) AS InsertedDate
     FROM TA_SEP_EventMasterData_History a
-    FULL OUTER JOIN dbo.CountyArrTbl CAT ON CONVERT(DATE, a.InsertedDate) = CONVERT(DATE, CAT.insertDate)
-    FULL OUTER JOIN #tempFileUpload f ON CONVERT(DATE, a.InsertedDate) = f.FileAddedDate
-    WHERE a.Action = 'U' AND a.Purpose IS NOT NULL AND a.PK_SEPEventID = @SEPEventID
-    GROUP BY CONVERT(DATE, a.InsertedDate), CONVERT(DATE, CAT.insertDate), f.FileName, f.FileAddedDate
-    ORDER BY CONVERT(DATE, a.InsertedDate) ASC;
+    FULL OUTER JOIN dbo.CountyArrTbl CAT 
+        ON CONVERT(DATE, a.InsertedDate) = CONVERT(DATE, CAT.insertDate)
+    FULL OUTER JOIN #tempFileUpload f 
+        ON COALESCE(CONVERT(DATE, a.InsertedDate), CAT.insertDate) = f.FileAddedDate
+    WHERE (a.Action = 'U' AND a.Purpose IS NOT NULL AND a.PK_SEPEventID = @SEPEventID)
+       OR (f.FileAddedDate IS NOT NULL)
+    GROUP BY 
+        COALESCE(CONVERT(DATE, a.InsertedDate), f.FileAddedDate), 
+        f.FileName, 
+        f.FileAddedDate
+    ORDER BY 
+        COALESCE(CONVERT(DATE, a.InsertedDate), f.FileAddedDate) ASC;
 
     -- Drop the temporary tables
     DROP TABLE dbo.CountyArrTbl;
