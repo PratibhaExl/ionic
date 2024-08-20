@@ -237,6 +237,322 @@ export default DynamicFormField;
 
 
 
+ex 3-
+
+
+
+// useAgentRows.tsx
+
+import { useState } from 'react';
+
+interface AgentRow {
+  agentNumber: string;
+  agentName: string;
+  agentCommission: string;
+}
+
+export const useAgentRows = () => {
+  const [agentRows, setAgentRows] = useState<AgentRow[]>([]);
+
+  const addAgentRow = () => {
+    if (agentRows.length < 4) {
+      setAgentRows([
+        ...agentRows,
+        { agentNumber: '', agentName: '', agentCommission: '' }
+      ]);
+    }
+  };
+
+  const removeAgentRow = (index: number) => {
+    setAgentRows(agentRows.filter((_, i) => i !== index));
+  };
+
+  const updateAgentRow = (index: number, updatedRow: Partial<AgentRow>) => {
+    setAgentRows(
+      agentRows.map((row, i) =>
+        i === index ? { ...row, ...updatedRow } : row
+      )
+    );
+  };
+
+  return { agentRows, addAgentRow, removeAgentRow, updateAgentRow };
+};
+
+
+// DynamicFormField.tsx
+
+import React from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { TextField, FormControl, InputLabel, MenuItem, Select, FormControlLabel, Radio, RadioGroup, FormLabel, Grid, IconButton } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { useAgentRows } from './useAgentRows'; // Adjust the path as needed
+
+export type FieldOption = {
+  value: string;
+  label: string;
+};
+
+export type TextConfig = {
+  type: 'text';
+  name: string;
+  label: string;
+  rules?: any;
+  defaultValue?: string;
+};
+
+export type SelectConfig = {
+  type: 'select';
+  name: string;
+  label: string;
+  options: FieldOption[];
+  rules?: any;
+  defaultValue?: string;
+};
+
+export type RadioConfig = {
+  type: 'radio';
+  name: string;
+  label: string;
+  options: FieldOption[];
+  rules?: any;
+  defaultValue?: string;
+};
+
+export type DateConfig = {
+  type: 'date';
+  name: string;
+  label: string;
+  rules?: any;
+  defaultValue?: Date;
+};
+
+export type HeadingConfig = {
+  type: 'heading';
+  label: string;
+};
+
+export type FieldConfig =
+  | TextConfig
+  | SelectConfig
+  | RadioConfig
+  | DateConfig
+  | HeadingConfig;
+
+interface DynamicFormFieldProps {
+  fieldConfig: FieldConfig;
+  isReview: boolean;
+}
+
+const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig, isReview }) => {
+  const { control, formState: { errors }, trigger } = useFormContext();
+
+  const getErrorMessage = (name: string): string | undefined => {
+    return errors[name]?.message as string | undefined;
+  };
+
+  const handleChange = async (name: string) => {
+    await trigger(name); // Trigger validation for the specific field on change
+  };
+
+  switch (fieldConfig.type) {
+    case 'text':
+      return (
+        <Grid item xs={12}>
+          <FormLabel>{fieldConfig.label}</FormLabel>
+          <Controller
+            name={fieldConfig.name}
+            control={control}
+            defaultValue={fieldConfig.defaultValue || ''}
+            rules={fieldConfig.rules}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                variant="outlined"
+                fullWidth
+                error={Boolean(errors[fieldConfig.name])}
+                helperText={getErrorMessage(fieldConfig.name)}
+                onChange={(e) => {
+                  field.onChange(e);
+                  handleChange(fieldConfig.name);
+                }}
+              />
+            )}
+          />
+        </Grid>
+      );
+
+    case 'select':
+      return (
+        <Grid item xs={12}>
+          <FormLabel>{fieldConfig.label}</FormLabel>
+          <FormControl variant="outlined" fullWidth error={Boolean(errors[fieldConfig.name])}>
+            <InputLabel>{fieldConfig.label}</InputLabel>
+            <Controller
+              name={fieldConfig.name}
+              control={control}
+              defaultValue={fieldConfig.defaultValue || ''}
+              rules={fieldConfig.rules}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  label={fieldConfig.label}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleChange(fieldConfig.name);
+                  }}
+                >
+                  {fieldConfig.options?.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          </FormControl>
+        </Grid>
+      );
+
+    case 'radio':
+      return (
+        <Grid item xs={12}>
+          <FormLabel>{fieldConfig.label}</FormLabel>
+          <Controller
+            name={fieldConfig.name}
+            control={control}
+            defaultValue={fieldConfig.defaultValue || ''}
+            rules={fieldConfig.rules}
+            render={({ field }) => (
+              <FormControl component="fieldset" error={Boolean(errors[fieldConfig.name])}>
+                <RadioGroup
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    handleChange(fieldConfig.name);
+                  }}
+                >
+                  {fieldConfig.options?.map(option => (
+                    <FormControlLabel
+                      key={option.value}
+                      value={option.value}
+                      control={<Radio />}
+                      label={option.label}
+                    />
+                  ))}
+                </RadioGroup>
+                {getErrorMessage(fieldConfig.name) && (
+                  <FormHelperText>{getErrorMessage(fieldConfig.name)}</FormHelperText>
+                )}
+              </FormControl>
+            )}
+          />
+        </Grid>
+      );
+
+    case 'date':
+      return (
+        <Grid item xs={12}>
+          <FormLabel>{fieldConfig.label}</FormLabel>
+          <Controller
+            name={fieldConfig.name}
+            control={control}
+            defaultValue={fieldConfig.defaultValue || new Date()}
+            rules={fieldConfig.rules}
+            render={({ field }) => (
+              <DatePicker
+                {...field}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="outlined"
+                    fullWidth
+                    error={Boolean(errors[fieldConfig.name])}
+                    helperText={getErrorMessage(fieldConfig.name)}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      handleChange(fieldConfig.name);
+                    }}
+                  />
+                )}
+              />
+            )}
+          />
+        </Grid>
+      );
+
+    case 'heading':
+      return (
+        <Grid item xs={12}>
+          <FormLabel>{fieldConfig.label}</FormLabel>
+        </Grid>
+      );
+
+    case 'agentsplitcommissionrow':
+      const { agentRows, addAgentRow, removeAgentRow, updateAgentRow } = useAgentRows();
+      return (
+        <>
+          {agentRows.map((row, index) => (
+            <Grid container spacing={2} key={index} alignItems="center">
+              <Grid item xs={4}>
+                <FormLabel>Agent Number</FormLabel>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  value={row.agentNumber}
+                  onChange={(e) => updateAgentRow(index, { agentNumber: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <FormLabel>Agent Name</FormLabel>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  value={row.agentName}
+                  onChange={(e) => updateAgentRow(index, { agentName: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                <FormLabel>Agent Commission</FormLabel>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  value={row.agentCommission}
+                  onChange={(e) => updateAgentRow(index, { agentCommission: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <IconButton onClick={() => removeAgentRow(index)} disabled={agentRows.length <= 1}>
+                  <RemoveIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
+          ))}
+          <IconButton onClick={addAgentRow} disabled={agentRows.length >= 4}>
+            <AddIcon />
+          </IconButton>
+        </>
+      );
+
+    default:
+      return null;
+  }
+};
+
+export default DynamicFormField;
+
+
+
+
+
+
+
+  
+
+
+  
+
+
 
 
 
