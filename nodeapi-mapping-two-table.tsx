@@ -1,42 +1,55 @@
-const getRecords = async (req, res) => {
+
+
+
+import { MongoClient, Filter, Document, ObjectId } from 'mongodb';
+
+async function FetchCampaignDetails(fetchInfo: Filter<Document> = {}): Promise<Document[]> {
     try {
-        const { id } = req.query;
+        const db = await mongoDB(); // Assuming mongoDB is a function returning a connected DB instance
+        const campaignCollection = db.collection('CampaignDetails');
+        const workflowCollection = db.collection('WorkflowDetails');
 
-        let records;
-        if (id) {
-            // Fetch single record by id from Table A
-            records = await TableA.findOne({ id, isActive: true }).lean();
+        // Convert _id to ObjectId if it's present in fetchInfo and it's a string
+        if (fetchInfo._id && typeof fetchInfo._id === 'string') {
+            fetchInfo._id = new ObjectId(fetchInfo._id);
+        }
 
-            if (records) {
-                // Fetch corresponding workflowname from Table B based on detailId
-                const workflowRecord = await TableB.findOne({
-                    detailId: records.detailId,
-                    isActive: true
-                }, 'workflowname').lean();
+        // Add the IsActive condition to the query for Table A
+        const query = { ...fetchInfo, IsActive: true };
 
-                if (workflowRecord) {
-                    records.workflowname = workflowRecord.workflowname;
-                }
-            }
-        } else {
-            // Fetch all records from Table A
-            records = await TableA.find({ isActive: true }).lean();
+        // Fetch records from Table A (CampaignDetails)
+        let campaignData = await campaignCollection.find(query).toArray();
 
-            // Attach workflowname from Table B to each record
-            for (let record of records) {
-                const workflowRecord = await TableB.findOne({
-                    detailId: record.detailId,
-                    isActive: true
-                }, 'workflowname').lean();
+        // If no specific _id is provided or no records were found, fetch all active records
+        if (!fetchInfo._id || campaignData.length === 0) {
+            campaignData = await campaignCollection.find({ IsActive: true }).toArray();
+        }
 
-                if (workflowRecord) {
-                    record.workflowname = workflowRecord.workflowname;
+        // Enrich CampaignData with workflowName from Table B (WorkflowDetails)
+        for (let campaign of campaignData) {
+            if (campaign.detailId) {
+                const workflow = await workflowCollection.findOne({ detailId: campaign.detailId, IsActive: true });
+                if (workflow && workflow.workflowName) {
+                    campaign.workflowName = workflow.workflowName;
                 }
             }
         }
 
-        res.json(records || []);
+        return campaignData;
+
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error fetching campaign details:', error);
+        throw new Error('Failed to fetch campaign details');
     }
-};
+}
+
+//usage-
+
+const campaignDetails = await FetchCampaignDetails({ _id: "64cda1e7f1b2b8a5d6e56c8a" });
+const allActiveCampaigns = await FetchCampaignDetails();
+const filteredCampaigns = await FetchCampaignDetails({ campaignName: "Summer Sale" });
+
+
+    
+
+
