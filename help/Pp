@@ -1,0 +1,63 @@
+Q: How does the using statement work in C#? A: The using statement is used to ensure that IDisposable objects like file streams, database connections, etc., are properly disposed of when no longer needed. It automatically calls the Dispose method at the end of the block.
+
+Q: Explain the difference between ref and out parameters. A: Both ref and out are used to pass arguments by reference. The ref keyword requires that the parameter is initialized before being passed, while out does not require initialization, but it must be assigned a value before the method exits.
+
+Q: What is the purpose of async and await in C#? A: async and await are used for asynchronous programming. async is used to indicate that a method contains asynchronous operations, and await is used to suspend the execution of a method until the awaited task completes, allowing other tasks to run concurrently.
+
+Q: What is the difference between an abstract class and an interface? A: An abstract class can contain implementation code, fields, and constructors, while an interface can only contain method declarations (signatures) and properties without any implementation. A class can implement multiple interfaces but can only inherit from one abstract class.
+
+Q: How does garbage collection work in C#? A: Garbage collection (GC) in C# is an automatic memory management feature that reclaims memory used by objects that are no longer accessible. It works in generations (0, 1, 2) to optimize performance by collecting short-lived objects more frequently.
+
+Q: What is LINQ and how is it used? A: LINQ (Language Integrated Query) is a set of methods and query syntax in C# that allows querying collections like arrays, lists, and databases in a consistent manner. It provides a way to filter, sort, group, and manipulate data in a declarative style.
+
+ASP.NET
+Q: What is the difference between ASP.NET Web Forms and ASP.NET MVC? A: Web Forms follow an event-driven model with a focus on stateful controls and server-side processing. MVC (Model-View-Controller) is a pattern that separates an application into three main components, allowing for more control over HTML and better separation of concerns.
+
+Q: How does ASP.NET handle state management? A: ASP.NET manages state using various techniques like ViewState, Session State, Application State, Cookies, and Query Strings, depending on whether the state needs to be persisted across requests, user sessions, or globally.
+
+Q: Explain the ASP.NET Page Life Cycle. A: The ASP.NET Page Life Cycle consists of several stages: Initialization, Load, Postback event handling, Rendering, and Unload. Each stage provides an opportunity to perform specific tasks, like setting properties, loading data, or handling postback events.
+
+Q: What are HTTP Handlers and Modules in ASP.NET? A: HTTP Handlers are components that process individual HTTP requests, while HTTP Modules are classes that handle events during the request processing pipeline. They provide customization points for handling requests and responses.
+
+Q: How does routing work in ASP.NET MVC? A: Routing in ASP.NET MVC is used to map URLs to controller actions. Routes are defined in the RouteConfig file and typically consist of a URL pattern and associated controller/action parameters, allowing for clean URLs and dynamic content generation.
+
+Q: What is Web API in ASP.NET and how is it used? A: ASP.NET Web API is a framework for building HTTP services that can be consumed by a variety of clients, including browsers, mobile devices, and other servers. It is typically used to create RESTful services with support for CRUD operations.
+
+ADO.NET
+Q: What is ADO.NET and how is it used? A: ADO.NET is a data access technology from Microsoft that provides communication between applications and data sources like SQL Server. It allows executing commands, retrieving data, and managing database connections using objects like Connection, Command, DataReader, and DataAdapter.
+
+Q: Explain the difference between a DataSet and a DataReader. A: DataSet is a disconnected, in-memory representation of data that can hold multiple tables, whereas DataReader is a connected, forward-only, read-only stream of data retrieved from a database. DataSet allows for data manipulation without an active connection to the database.
+
+Q: How do you perform a parameterized query in ADO.NET? A: A parameterized query in ADO.NET is executed using the SqlCommand object, with parameters added via the Parameters collection. This helps prevent SQL injection attacks by separating the SQL code from the data values.
+
+Q: What is the role of the SqlConnection object? A: SqlConnection manages the connection to a SQL Server database. It is used to open and close the connection to execute queries and retrieve data. Proper handling of the connection object is crucial to avoid resource leaks.
+
+Q: What is SqlDataAdapter and how does it work? A: SqlDataAdapter acts as a bridge between a DataSet and the database. It uses SelectCommand, InsertCommand, UpdateCommand, and DeleteCommand to retrieve and modify data in a DataSet. It facilitates disconnected data manipulation.
+
+Q: How does transaction management work in ADO.NET? A: Transactions in ADO.NET are managed using the SqlTransaction object. You start a transaction with BeginTransaction(), and then you can commit or rollback the transaction based on success or failure of the database operations.
+
+SSIS (SQL Server Integration Services)
+Q: What is SSIS and how is it used? A: SSIS is a platform for building data integration and workflow solutions. It is used to extract, transform, and load (ETL) data from various sources into a data warehouse or database, automate administrative tasks, and perform data cleansing.
+
+Q: Explain the difference between a Control Flow and a Data Flow in SSIS. A: Control Flow orchestrates the order and conditions under which tasks are executed, including loops, decision-making, and event handling. Data Flow handles the actual ETL process, moving and transforming data between sources and destinations.
+
+Q: How do you handle errors in SSIS packages? A: Error handling in SSIS can be done using event handlers, the OnError event, or redirecting rows with errors to a separate output in the Data Flow using error outputs. This allows logging, reprocessing, or cleaning of erroneous data.
+
+Q: What are SSIS Expressions and how are they used? A: SSIS Expressions are used to dynamically evaluate values at runtime within tasks and components. They can be used for conditions in precedence constraints, setting variable values, or dynamically generating SQL queries.
+
+Q: What is the role of Variables in SSIS? A: Variables in SSIS store values that can be used across tasks and containers in a package. They allow for dynamic behavior, such as passing values between tasks or configuring components at runtime.
+
+Q: How do you deploy an SSIS package? A: SSIS packages can be deployed using the SQL Server Data Tools (SSDT), the SSIS Catalog (Project Deployment Model), or by saving the package as a file and importing it into SQL Server (Package Deployment Model). Deployment allows the package to be executed on a server.
+
+SQL
+Q: What is the difference between INNER JOIN and LEFT JOIN? A: INNER JOIN returns only the rows that have matching values in both tables, while LEFT JOIN returns all rows from the left table and the matching rows from the right table. If there’s no match, NULL values are returned for columns from the right table.
+
+Q: Explain the use of indexes in SQL. A: Indexes improve query performance by allowing faster retrieval of records from a table. They work like a table of contents, enabling the database engine to quickly locate the desired rows without scanning the entire table.
+
+Q: What is normalization, and why is it important? A: Normalization is the process of organizing data to minimize redundancy and dependency by dividing larger tables into smaller ones and defining relationships between them. It improves data integrity and optimizes storage.
+
+Q: How does the GROUP BY clause work? A: GROUP BY groups rows that have the same values in specified columns into aggregated data. It is often used with aggregate functions like COUNT, SUM, AVG, MAX, and MIN to perform calculations on each group of rows.
+
+Q: What is a Stored Procedure, and how is it used? A: A stored procedure is a precompiled collection of SQL statements that can be executed as a single unit. They are used to encapsulate logic, improve performance, and allow for code reuse within the database.
+
+Q: What are Triggers in SQL? A: Triggers are special types of stored procedures that automatically execute in response to certain events on a table or view, such as INSERT, UPDATE, or DELETE. They are used to enforce business rules,
