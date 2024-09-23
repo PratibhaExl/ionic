@@ -139,3 +139,113 @@
 
 
 
+
+
+
+
+
+
+<!-- app.component.html -->
+<ngx-datatable
+  class="material striped"
+  [rows]="rows"
+  [columns]="columns"
+  [columnMode]="'force'"
+  [headerHeight]="50"
+  [footerHeight]="50"
+  [rowHeight]="'auto'"
+  [scrollbarV]="true"
+>
+  <ngx-datatable-column name="Name" prop="name" [flexGrow]="1"></ngx-datatable-column>
+  <ngx-datatable-column name="Email" prop="email" [flexGrow]="1"></ngx-datatable-column>
+  <ngx-datatable-column name="Role" prop="role" [flexGrow]="1"></ngx-datatable-column>
+  <ngx-datatable-column name="Actions" [flexGrow]="0.5">
+    <ng-template ngx-datatable-cell-template let-row="row">
+      <button
+        ion-button
+        fill="clear"
+        color="primary"
+        class="download-btn"
+        (click)="onDownload(row.id)"
+      >
+        <ion-icon name="download-outline"></ion-icon>
+      </button>
+    </ng-template>
+  </ngx-datatable-column>
+</ngx-datatable>
+
+
+
+// app.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css'],
+})
+export class AppComponent {
+  columns = [
+    { name: 'Name', prop: 'name' },
+    { name: 'Email', prop: 'email' },
+    { name: 'Role', prop: 'role' },
+    { name: 'Actions' },
+  ];
+
+  rows = [
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'Administrator' },
+    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', role: 'Editor' },
+    { id: 3, name: 'Alice Johnson', email: 'alice.johnson@example.com', role: 'Viewer' },
+  ];
+
+  onDownload(id: number) {
+    // Implement your download functionality here
+    console.log('Download clicked for ID:', id);
+    // You can add further logic, such as calling a service to fetch data based on the ID
+  }
+}
+
+
+
+
+/* app.component.css */
+ngx-datatable {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Header Styling */
+.datatable-header {
+  background-color: #007bff;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: left;
+  padding: 12px;
+}
+
+/* Row and Cell Styling */
+.datatable-body-row {
+  transition: background-color 0.3s ease-in-out;
+}
+
+.datatable-body-row:hover {
+  background-color: #f0f8ff;
+}
+
+.download-btn {
+  margin: 0;
+  padding: 0;
+  color: #007bff;
+}
+
+ion-icon {
+  font-size: 18px;
+}
+
+
+
+
+
+
+
