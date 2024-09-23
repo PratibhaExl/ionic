@@ -1,0 +1,141 @@
+
+
+<ion-grid class="custom-grid">
+  <!-- Heading Row -->
+  <ion-row class="heading-row">
+    <ion-col size="12">
+      <h1 class="heading-title">Responsive Grid Layout</h1>
+    </ion-col>
+  </ion-row>
+
+  <!-- Data Rows -->
+  <ion-row class="body-row">
+    <ion-col size="12" size-md="6" class="col-item">
+      <div class="data-card">
+        <h2 class="card-title">Card Title 1</h2>
+        <p class="card-body">
+          This is some impressive and responsive data for mobile view and
+          browser.
+        </p>
+      </div>
+    </ion-col>
+
+    <ion-col size="12" size-md="6" class="col-item">
+      <div class="data-card">
+        <h2 class="card-title">Card Title 2</h2>
+        <p class="card-body">
+          This section adjusts beautifully to various screen sizes and provides
+          a seamless experience.
+        </p>
+      </div>
+    </ion-col>
+
+    <ion-col size="12" size-md="4" class="col-item">
+      <div class="data-card">
+        <h2 class="card-title">Card Title 3</h2>
+        <p class="card-body">
+          The content is well-aligned, aesthetically pleasing, and highly
+          readable.
+        </p>
+      </div>
+    </ion-col>
+
+    <ion-col size="12" size-md="4" class="col-item">
+      <div class="data-card">
+        <h2 class="card-title">Card Title 4</h2>
+        <p class="card-body">
+          This layout maintains a balanced and organized appearance across all
+          devices.
+        </p>
+      </div>
+    </ion-col>
+
+    <ion-col size="12" size-md="4" class="col-item">
+      <div class="data-card">
+        <h2 class="card-title">Card Title 5</h2>
+        <p class="card-body">
+          Flexible grid settings make it easy to create responsive designs.
+        </p>
+      </div>
+    </ion-col>
+  </ion-row>
+</ion-grid>
+
+
+
+
+
+.custom-grid {
+  padding: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Heading Styles */
+.heading-row {
+  background-color: #007bff;
+  color: #ffffff;
+  text-align: center;
+  padding: 20px 0;
+  border-radius: 5px;
+}
+
+.heading-title {
+  font-size: 24px;
+  margin: 0;
+}
+
+/* Body Row Styles */
+.body-row {
+  margin-top: 20px;
+}
+
+/* Column Item Styles */
+.col-item {
+  padding: 10px;
+}
+
+/* Card Styles */
+.data-card {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.data-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+  color: #007bff;
+}
+
+.card-body {
+  font-size: 16px;
+  color: #555555;
+  line-height: 1.5;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .heading-title {
+    font-size: 20px;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .card-body {
+    font-size: 14px;
+  }
+}
+
+
+
