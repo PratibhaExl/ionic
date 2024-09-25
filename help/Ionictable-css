@@ -245,6 +245,177 @@ ion-icon {
 
 
 
+// ngx best approach data table and with serch in ionic dynamic 
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Data Table</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Search bar for filtering rows -->
+  <ion-searchbar [(ngModel)]="searchText" (ionInput)="filterRows()"></ion-searchbar>
+
+  <!-- Data table with ngx-datatable -->
+  <ngx-datatable
+    class="material"
+    [rows]="filteredRows"
+    [columns]="columns"
+    [columnMode]="'force'"
+    [headerHeight]="50"
+    [footerHeight]="50"
+    [rowHeight]="'auto'"
+    [scrollbarV]="true"
+    [limit]="pageSize"
+    [count]="totalRecords"
+    [offset]="currentPage - 1"
+    (page)='setPage($event)'
+  >
+    <ngx-datatable-column name="ID" prop="id" [width]="50"></ngx-datatable-column>
+    <ngx-datatable-column name="Name" prop="name" [width]="150"></ngx-datatable-column>
+    <ngx-datatable-column name="Email" prop="email" [width]="250"></ngx-datatable-column>
+    <ngx-datatable-column name="Actions" [width]="100">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <ion-button
+          fill="clear"
+          color="primary"
+          class="download-btn"
+          (click)="onDownload(row.id)"
+        >
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+
+  <!-- Pagination controls -->
+  <ion-footer>
+    <ion-toolbar>
+      <ion-button expand="block" [disabled]="currentPage <= 1" (click)="previousPage()">
+        Previous
+      </ion-button>
+      <ion-button expand="block" [disabled]="currentPage >= totalPages" (click)="nextPage()">
+        Next
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+</ion-content>
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-data-table',
+  templateUrl: './data-table.page.html',
+  styleUrls: ['./data-table.page.scss'],
+})
+export class DataTablePage implements OnInit {
+  rows = [];
+  filteredRows = [];
+  columns = [
+    { name: 'ID', prop: 'id' },
+    { name: 'Name', prop: 'name' },
+    { name: 'Email', prop: 'email' },
+    { name: 'Actions' },
+  ];
+
+  searchText = '';
+  currentPage = 1;
+  pageSize = 10;
+  totalRecords = 0;
+  totalPages = 0;
+
+  constructor() {}
+
+  ngOnInit() {
+    // Fetch your data here
+    this.rows = [
+      { id: 1, name: 'John Doe', email: 'john.doe@example.com' },
+      { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com' },
+      { id: 3, name: 'Alice Johnson', email: 'alice.johnson@example.com' },
+      // Add more data here
+    ];
+    this.totalRecords = this.rows.length;
+    this.totalPages = Math.ceil(this.totalRecords / this.pageSize);
+    this.filterRows();
+  }
+
+  filterRows() {
+    if (this.searchText.trim() === '') {
+      this.filteredRows = this.rows.slice(
+        (this.currentPage - 1) * this.pageSize,
+        this.currentPage * this.pageSize
+      );
+    } else {
+      this.filteredRows = this.rows
+        .filter((row) =>
+          row.name.toLowerCase().includes(this.searchText.toLowerCase())
+        )
+        .slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+    }
+  }
+
+  onDownload(id: number) {
+    // Your download logic goes here
+    console.log('Download triggered for ID:', id);
+  }
+
+  setPage(event: any) {
+    this.currentPage = event.offset + 1;
+    this.filterRows();
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.filterRows();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.filterRows();
+    }
+  }
+}
+
+css
+
+ngx-datatable {
+  margin-top: 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+ion-button.download-btn {
+  color: #007bff;
+}
+
+ngx-datatable .datatable-body-row:hover {
+  background-color: #f0f8ff;
+}
+
+ion-searchbar {
+  margin-bottom: 15px;
+}
+
+ion-footer {
+  padding: 10px;
+}
+
+ion-toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+
+
+
+
+
 
 
 
