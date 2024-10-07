@@ -1,0 +1,31 @@
+├── app
+│   ├── Console           # Console commands
+│   ├── Events            # Event listeners and dispatchers
+│   ├── Exceptions        # Custom exceptions
+│   ├── Http
+│   │   ├── Controllers   # Controllers for business logic
+│   │   │   ├── Api       # Specific for API endpoints
+│   │   │   ├── Web       # Specific for Web endpoints
+│   │   ├── Middleware    # Middleware for request handling
+│   ├── Models            # Eloquent models
+│   ├── Repositories      # Data access layer
+│   ├── Services          # Business logic layer
+├── config                # Configuration files (customize as needed for U.S. clients)
+├── database
+│   ├── factories         # Factories for testing and seeding
+│   ├── migrations        # Database migrations
+│   ├── seeders           # Database seeders
+├── resources
+│   ├── lang              # Language files (e.g., `en_us` for U.S.-specific text)
+│   ├── views             # Blade views
+├── routes
+│   ├── api.php           # API routes
+│   ├── web.php           # Web routes
+├── storage
+├── tests                 # Unit and feature tests
+├── .env                  # Environment configuration
+├── composer.json         # Composer dependencies
+├── artisan               # Command-line interface
+└── public
+    ├── index.php         # Entry point for the application
+    └── assets            # JS, CSS, and other assets
