@@ -110,36 +110,68 @@ export default DocumentUploader;
 
 …*********
 
+
 import React, { useState } from 'react';
+
+interface DocumentData {
+  file: File;
+  name: string;
+  uploadTime: string;
+  applicantName: string;
+  product: string;
+  documentType: string;
+}
 
 function DocumentUploader() {
   const [applicantName, setApplicantName] = useState('');
   const [product, setProduct] = useState('');
   const [documentType, setDocumentType] = useState('');
-  const [uploadedDocuments, setUploadedDocuments] = useState([]);
+  const [uploadedDocuments, setUploadedDocuments] = useState<DocumentData[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newFiles = files
-      .filter((file) => file.type === 'image/jpeg' || file.type === 'image/png')
-      .map((file) => ({
-        file,
-        name: file.name,
-        uploadTime: new Date().toLocaleString(),
-        applicantName,
-        product,
-        documentType,
-      }));
+  // Utility function to check if a file is a valid image type
+  const isValidImage = (file: File): boolean => {
+    return file.type === 'image/jpeg' || file.type === 'image/png';
+  };
 
-    if (newFiles.length + uploadedDocuments.length > 5) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    if (files.length + uploadedDocuments.length > 5) {
       alert('You can only upload a maximum of 5 images');
       return;
     }
 
-    setUploadedDocuments((prev) => [...prev, ...newFiles]);
+    const newFiles = files.filter(isValidImage);
+
+    const duplicateFile = newFiles.find((file) =>
+      uploadedDocuments.some((doc) => doc.name === file.name) ||
+      pendingFiles.some((pending) => pending.name === file.name)
+    );
+
+    if (duplicateFile) {
+      alert(`File name "${duplicateFile.name}" already exists.`);
+      return;
+    }
+
+    setPendingFiles((prev) => [...prev, ...newFiles]);
   };
 
-  const handleDelete = (index) => {
+  const handleUpload = () => {
+    const newDocuments = pendingFiles.map((file) => ({
+      file,
+      name: file.name,
+      uploadTime: new Date().toLocaleString(),
+      applicantName,
+      product,
+      documentType,
+    }));
+
+    setUploadedDocuments((prev) => [...prev, ...newDocuments]);
+    setPendingFiles([]); // Clear the pending files after upload
+  };
+
+  const handleDelete = (index: number) => {
     setUploadedDocuments((prev) => prev.filter((_, i) => i !== index));
   };
 
@@ -179,25 +211,18 @@ function DocumentUploader() {
           onChange={handleFileChange}
         />
       </div>
+      <button onClick={handleUpload} disabled={pendingFiles.length === 0}>
+        Upload
+      </button>
 
       <div className="document-grid">
         {uploadedDocuments.map((doc, index) => (
           <div key={index} className="document-item">
-            <div>
-              <strong>Applicant Name:</strong> {doc.applicantName}
-            </div>
-            <div>
-              <strong>Product:</strong> {doc.product}
-            </div>
-            <div>
-              <strong>Document Type:</strong> {doc.documentType}
-            </div>
-            <div>
-              <strong>Document Name:</strong> {doc.name}
-            </div>
-            <div>
-              <strong>Date & Time:</strong> {doc.uploadTime}
-            </div>
+            <div><strong>Applicant Name:</strong> {doc.applicantName}</div>
+            <div><strong>Product:</strong> {doc.product}</div>
+            <div><strong>Document Type:</strong> {doc.documentType}</div>
+            <div><strong>Document Name:</strong> {doc.name}</div>
+            <div><strong>Date & Time:</strong> {doc.uploadTime}</div>
             <img
               src={URL.createObjectURL(doc.file)}
               alt={`Uploaded ${doc.name}`}
