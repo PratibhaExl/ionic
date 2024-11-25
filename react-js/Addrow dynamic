@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { TextField, Button } from '@material-ui/core';
+
+const DynamicForm = () => {
+  const { control, handleSubmit, getValues, setValue } = useForm();
+  const [rows, setRows] = useState([]);
+
+  const addRow = () => {
+    setRows([...rows, { prescribedmedications: '', diagnosis: '' }]);
+  };
+
+  const removeRow = (index) => {
+    const updatedRows = rows.filter((_, i) => i !== index);
+    setRows(updatedRows);
+  };
+
+  const onSubmit = (data) => {
+    console.log('Form data:', data);
+  };
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {rows.map((_, index) => (
+          <div key={index} style={{ marginBottom: '20px' }}>
+            <Controller
+              name={`prescribedmedications[${index}]`}
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Prescribed Medications"
+                  variant="outlined"
+                  fullWidth
+                  style={{ marginBottom: '10px' }}
+                />
+              )}
+            />
+            <Controller
+              name={`diagnosis[${index}]`}
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Reason for Medication (Diagnosis)"
+                  variant="outlined"
+                  fullWidth
+                  style={{ marginBottom: '10px' }}
+                />
+              )}
+            />
+            <Button variant="contained" color="secondary" onClick={() => removeRow(index)}>
+              Remove Row
+            </Button>
+          </div>
+        ))}
+
+        <Button variant="contained" color="primary" onClick={addRow} style={{ marginBottom: '20px' }}>
+          Add Row
+        </Button>
+        <Button variant="contained" color="primary" type="submit">
+          Submit
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+export default DynamicForm;
