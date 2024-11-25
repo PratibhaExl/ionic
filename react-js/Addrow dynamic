@@ -1,3 +1,73 @@
+
+import React, { useState } from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
+import { TextField, Button } from '@material-ui/core';
+
+const HealthInfo = () => {
+  const { control } = useFormContext();
+  const [rows, setRows] = useState([]);
+
+  const addRow = () => {
+    setRows([...rows, { prescribedmedications: '', diagnosis: '' }]);
+  };
+
+  const removeRow = (index) => {
+    const updatedRows = rows.filter((_, i) => i !== index);
+    setRows(updatedRows);
+  };
+
+  return (
+    <div>
+      <h2>Health Info</h2>
+      {rows.map((_, index) => (
+        <div key={index} style={{ marginBottom: '20px' }}>
+          <Controller
+            name={`prescribedmedications[${index}]`}
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Prescribed Medications"
+                variant="outlined"
+                fullWidth
+                style={{ marginBottom: '10px' }}
+              />
+            )}
+          />
+          <Controller
+            name={`diagnosis[${index}]`}
+            control={control}
+            defaultValue=""
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Reason for Medication (Diagnosis)"
+                variant="outlined"
+                fullWidth
+                style={{ marginBottom: '10px' }}
+              />
+            )}
+          />
+          <Button variant="contained" color="secondary" onClick={() => removeRow(index)}>
+            Remove Row
+          </Button>
+        </div>
+      ))}
+      <Button variant="contained" color="primary" onClick={addRow}>
+        Add Row
+      </Button>
+    </div>
+  );
+};
+
+export default HealthInfo;
+
+
+
+
+
+
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { TextField, Button } from '@material-ui/core';
