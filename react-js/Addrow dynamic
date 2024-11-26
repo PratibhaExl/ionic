@@ -113,6 +113,84 @@ const DynamicForm: React.FC = () => {
               </Button>
             </Grid>
           ))}
+
+import React from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { useAddRows } from './useAddRows';
+import { TextField, Button, Grid } from '@mui/material';
+
+interface FormValues {
+  agents: { name: string; email: string }[];
+  products: { productName: string; price: string }[];
+}
+
+const DynamicForm: React.FC = () => {
+  const methods = useForm<FormValues>({
+    defaultValues: {
+      agents: [{ name: 'Default Agent', email: 'agent@example.com' }],
+      products: [{ productName: 'Default Product', price: '100' }],
+    },
+  });
+
+  const { control, handleSubmit } = methods;
+
+  // Manage agents field array
+  const {
+    fields: agentFields,
+    addRow: addAgentRow,
+    removeRow: removeAgentRow,
+  } = useAddRows<FormValues>({
+    control,
+    name: 'agents', // Valid FieldArrayPath in FormValues
+  });
+
+  // Manage products field array
+  const {
+    fields: productFields,
+    addRow: addProductRow,
+    removeRow: removeProductRow,
+  } = useAddRows<FormValues>({
+    control,
+    name: 'products', // Valid FieldArrayPath in FormValues
+  });
+
+  const onSubmit = (data: FormValues) => {
+    console.log('Form Data:', data);
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={2}>
+          {/* Agents Section */}
+          <Grid item xs={12}>
+            <h3>Agents</h3>
+          </Grid>
+          {agentFields.map((field, index) => (
+            <Grid item xs={12} key={field.id}>
+              <TextField
+                {...methods.register(`agents.${index}.name`)}
+                label={`Agent ${index + 1} Name`}
+                variant="outlined"
+                fullWidth
+              />
+              <TextField
+                {...methods.register(`agents.${index}.email`)}
+                label={`Agent ${index + 1} Email`}
+                variant="outlined"
+                fullWidth
+                style={{ marginLeft: '10px' }}
+              />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => removeAgentRow(index)}
+                style={{ marginLeft: '10px' }}
+              >
+                Remove Agent
+              </Button>
+            </Grid>
+          ))}
           <Grid item xs={12}>
             <Button
               variant="contained"
@@ -173,9 +251,6 @@ const DynamicForm: React.FC = () => {
 };
 
 export default DynamicForm;
-
-
-
 
 
 
