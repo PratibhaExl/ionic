@@ -213,7 +213,105 @@ Copy code
   ],
   "reasonForMedications": "Headache"
 }
-Let me know if you need further assistance!
+
+
+moved health ui to dynamic 
+
+import React from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { Grid, Button } from "@mui/material";
+import DynamicFormField from "./DynamicFormField";
+
+interface DynamicFormProps {
+  fieldConfig: Array<{
+    name: string;
+    label: string;
+    type: string; // "text", "fieldArray", etc.
+    fields?: Array<{ name: string; label: string; type: string }>; // Used for fieldArray
+  }>;
+  isReview: boolean;
+}
+
+const DynamicForm: React.FC<DynamicFormProps> = ({ fieldConfig, isReview }) => {
+  const { control } = useFormContext();
+
+  return (
+    <Grid container spacing={3}>
+      {fieldConfig.map((config) => {
+        if (config.type === "fieldArray" && config.fields) {
+          // Handle fieldArray type
+          const { fields, append, remove } = useFieldArray({
+            control,
+            name: config.name,
+          });
+
+          return (
+            <Grid item xs={12} key={config.name}>
+              <h3>{config.label}</h3>
+              {fields.map((field, index) => (
+                <Grid container spacing={2} key={field.id}>
+                  {config.fields.map((subField) => (
+                    <Grid item xs={6} key={subField.name}>
+                      <DynamicFormField
+                        fieldConfig={{
+                          ...subField,
+                          name: `${config.name}[${index}].${subField.name}`,
+                        }}
+                        isReview={isReview}
+                      />
+                    </Grid>
+                  ))}
+                  {!isReview && (
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => remove(index)}
+                        sx={{ marginTop: "10px" }}
+                      >
+                        Remove Row
+                      </Button>
+                    </Grid>
+                  )}
+                </Grid>
+              ))}
+              {!isReview && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() =>
+                    append(
+                      config.fields.reduce((acc: Record<string, string>, field) => {
+                        acc[field.name] = ""; // Initialize each subField with an empty string
+                        return acc;
+                      }, {})
+                    )
+                  }
+                  sx={{ marginTop: "10px" }}
+                >
+                  Add Row
+                </Button>
+              )}
+            </Grid>
+          );
+        } else {
+          // Handle simple fields
+          return (
+            <Grid item xs={12} key={config.name}>
+              <DynamicFormField
+                fieldConfig={config}
+                isReview={isReview}
+              />
+            </Grid>
+          );
+        }
+      })}
+    </Grid>
+  );
+};
+
+export default DynamicForm;
+
 
 
 
