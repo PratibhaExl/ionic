@@ -1,23 +1,25 @@
 
 
-import { useFieldArray, Control, FieldValues } from 'react-hook-form';
 
-interface UseAddRowsProps<T extends FieldValues> {
-  control: Control<T>; // Control from react-hook-form with the proper type
-  name: keyof T & string; // Field array name, must match keys in T
+
+import { useFieldArray, Control, FieldArrayPath } from 'react-hook-form';
+
+interface UseAddRowsProps<T> {
+  control: Control<T>; // react-hook-form Control
+  name: FieldArrayPath<T>; // Name must be a valid array path in T
 }
 
-export const useAddRows = <T extends FieldValues>({
+export const useAddRows = <T extends Record<string, any>>({
   control,
   name,
 }: UseAddRowsProps<T>) => {
   const { fields, append, remove } = useFieldArray({
     control,
-    name,
+    name, // FieldArrayPath<T> ensures it's a valid path to an array
   });
 
-  const addRow = (row: T[keyof T][number]) => {
-    append(row); // Add a new row to the field array
+  const addRow = (row: T[typeof name][number]) => {
+    append(row); // Add a new row to the array
   };
 
   const removeRow = (index: number) => {
@@ -30,6 +32,8 @@ export const useAddRows = <T extends FieldValues>({
     removeRow,
   };
 };
+
+
 
 
 import React from 'react';
