@@ -1,30 +1,27 @@
-To implement a reusable hook for managing dynamic forms with useFieldArray in React Hook Form, you can create a custom hook called useAddRows. This hook will encapsulate the logic for adding, removing, and managing rows in a dynamic form. Here's how you can do it:
 
-1. Create the useAddRows Hook
-The hook will use useFieldArray and provide functions to add and remove rows dynamically.
 
-useAddRows.ts:
-tsx
-Copy code
-import { useFieldArray, Control } from 'react-hook-form';
+import { useFieldArray, Control, FieldValues } from 'react-hook-form';
 
-interface UseAddRowsProps<T> {
-  control: Control<any>;
-  name: string;
+interface UseAddRowsProps<T extends FieldValues> {
+  control: Control<T>; // Control from react-hook-form with the proper type
+  name: keyof T & string; // Field array name, must match keys in T
 }
 
-export const useAddRows = <T,>({ control, name }: UseAddRowsProps<T>) => {
-  const { fields, append, remove } = useFieldArray<T>({
+export const useAddRows = <T extends FieldValues>({
+  control,
+  name,
+}: UseAddRowsProps<T>) => {
+  const { fields, append, remove } = useFieldArray({
     control,
     name,
   });
 
-  const addRow = (defaultValue: T) => {
-    append(defaultValue);
+  const addRow = (row: T[keyof T][number]) => {
+    append(row); // Add a new row to the field array
   };
 
   const removeRow = (index: number) => {
-    remove(index);
+    remove(index); // Remove a row by index
   };
 
   return {
@@ -33,77 +30,133 @@ export const useAddRows = <T,>({ control, name }: UseAddRowsProps<T>) => {
     removeRow,
   };
 };
-2. Using useAddRows in a React Component
-Here’s how you can use the useAddRows hook in a React component with dynamic fields:
 
-DynamicForm.tsx:
-tsx
-Copy code
+
 import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useAddRows } from './useAddRows';
 import { TextField, Button, Grid } from '@mui/material';
 
 interface FormValues {
-  items: { name: string; value: string }[];
+  agents: { name: string; email: string }[];
+  products: { productName: string; price: string }[];
 }
 
 const DynamicForm: React.FC = () => {
   const methods = useForm<FormValues>({
     defaultValues: {
-      items: [{ name: 'Default Item', value: '' }],
+      agents: [{ name: 'Default Agent', email: 'agent@example.com' }],
+      products: [{ productName: 'Default Product', price: '100' }],
     },
   });
 
   const { control, handleSubmit } = methods;
 
-  const { fields, addRow, removeRow } = useAddRows<{ name: string; value: string }>({
+  // Using `useAddRows` for agents
+  const {
+    fields: agentFields,
+    addRow: addAgentRow,
+    removeRow: removeAgentRow,
+  } = useAddRows<FormValues>({
     control,
-    name: 'items',
+    name: 'agents',
+  });
+
+  // Using `useAddRows` for products
+  const {
+    fields: productFields,
+    addRow: addProductRow,
+    removeRow: removeProductRow,
+  } = useAddRows<FormValues>({
+    control,
+    name: 'products',
   });
 
   const onSubmit = (data: FormValues) => {
-    console.log('Form Submitted:', data);
+    console.log('Form Data:', data);
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
-          {fields.map((field, index) => (
+          {/* Agents Section */}
+          <Grid item xs={12}>
+            <h3>Agents</h3>
+          </Grid>
+          {agentFields.map((field, index) => (
             <Grid item xs={12} key={field.id}>
               <TextField
-                {...methods.register(`items.${index}.name`)}
-                label={`Item ${index + 1} Name`}
+                {...methods.register(`agents.${index}.name`)}
+                label={`Agent ${index + 1} Name`}
                 variant="outlined"
                 fullWidth
               />
               <TextField
-                {...methods.register(`items.${index}.value`)}
-                label={`Item ${index + 1} Value`}
+                {...methods.register(`agents.${index}.email`)}
+                label={`Agent ${index + 1} Email`}
                 variant="outlined"
                 fullWidth
+                style={{ marginLeft: '10px' }}
               />
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={() => removeRow(index)}
+                onClick={() => removeAgentRow(index)}
                 style={{ marginLeft: '10px' }}
               >
-                Remove
+                Remove Agent
               </Button>
             </Grid>
           ))}
-
           <Grid item xs={12}>
             <Button
               variant="contained"
-              onClick={() => addRow({ name: '', value: '' })}
+              onClick={() => addAgentRow({ name: '', email: '' })}
             >
-              Add Row
+              Add Agent
             </Button>
           </Grid>
 
+          {/* Products Section */}
+          <Grid item xs={12}>
+            <h3>Products</h3>
+          </Grid>
+          {productFields.map((field, index) => (
+            <Grid item xs={12} key={field.id}>
+              <TextField
+                {...methods.register(`products.${index}.productName`)}
+                label={`Product ${index + 1} Name`}
+                variant="outlined"
+                fullWidth
+              />
+              <TextField
+                {...methods.register(`products.${index}.price`)}
+                label={`Product ${index + 1} Price`}
+                variant="outlined"
+                fullWidth
+                style={{ marginLeft: '10px' }}
+              />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => removeProductRow(index)}
+                style={{ marginLeft: '10px' }}
+              >
+                Remove Product
+              </Button>
+            </Grid>
+          ))}
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              onClick={() => addProductRow({ productName: '', price: '' })}
+            >
+              Add Product
+            </Button>
+          </Grid>
+
+          {/* Submit Button */}
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
               Submit
@@ -116,42 +169,6 @@ const DynamicForm: React.FC = () => {
 };
 
 export default DynamicForm;
-3. Key Features of useAddRows
-fields: The array of current fields in the form.
-addRow: A function to append a new row with default values.
-removeRow: A function to remove a specific row by index.
-Automatic Re-indexing: When you remove a row, React Hook Form automatically re-indexes the remaining fields.
-4. How It Works
-Initialize with Default Values:
-
-The form starts with one default row ([{ name: 'Default Item', value: '' }]).
-You can configure this based on your requirements.
-Adding Rows:
-
-When addRow is called, a new object ({ name: '', value: '' }) is appended to the items array.
-Removing Rows:
-
-When removeRow is called with an index, the corresponding entry in the items array is removed.
-Dynamic Rendering:
-
-The fields array is mapped to render TextField components for each row dynamically.
-Form State Management:
-
-react-hook-form ensures all fields are registered and their values are synced with the form state.
-5. Benefits of useAddRows
-Reusability: The hook can be reused across multiple components with different field configurations.
-Scalability: Easily manage dynamic forms with complex field requirements.
-Encapsulation: Keeps the logic for managing rows isolated from the component logic.
-This approach provides a clean, modular way to manage dynamic form fields in React using react-hook-form.
-
-
-
-
-
-
-
-
-
 
 
 
