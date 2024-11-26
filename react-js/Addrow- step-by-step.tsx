@@ -1,9 +1,154 @@
 
 
-
 Step-by-Step Implementation
-1. Setup the Parent Page (Enrollment.tsx)
-The Enrollment page will act as the parent, managing the global form context and rendering the HealthComponent and PlanComponent.
+1. Update ADD_MORE Configuration
+The ADD_MORE array should define configurations for each field or field group (like fieldArray) with properties such as name, label, type, etc.
+
+Example ADD_MORE Configuration:
+tsx
+Copy code
+export const ADD_MORE = [
+  {
+    name: "prescribedMedications",
+    label: "Prescribed Medications",
+    type: "fieldArray", // Dynamic array of fields
+    fields: [
+      { name: "medication", label: "Medication Name", type: "text" },
+      { name: "dosage", label: "Dosage", type: "text" },
+    ],
+  },
+  {
+    name: "reasonForMedications",
+    label: "Reason for Medications (Diagnosis)",
+    type: "text",
+  },
+];
+2. Create HealthComponent
+The HealthComponent dynamically renders fields from ADD_MORE using DynamicFormField. For fieldArray, leverage the useFieldArray hook.
+
+tsx
+Copy code
+import { useFieldArray, useFormContext } from "react-hook-form";
+import { Grid, Button } from "@mui/material";
+import DynamicFormField from "./DynamicFormField";
+import { ADD_MORE } from "./config";
+
+const HealthComponent: React.FC<{ isReview: boolean }> = ({ isReview }) => {
+  const { control, register } = useFormContext();
+
+  return (
+    <Grid container spacing={3} sx={{ marginTop: "20px" }}>
+      {ADD_MORE.map((config, index) => {
+        if (config.type === "fieldArray") {
+          const { fields, append, remove } = useFieldArray({
+            control,
+            name: config.name,
+          });
+
+          return (
+            <Grid item xs={12} key={config.name}>
+              <h3>{config.label}</h3>
+              {fields.map((field, fieldIndex) => (
+                <Grid container spacing={2} key={field.id}>
+                  {config.fields.map((fieldConfig) => (
+                    <Grid item xs={6} key={fieldConfig.name}>
+                      <DynamicFormField
+                        fieldConfig={{
+                          ...fieldConfig,
+                          name: `${config.name}[${fieldIndex}].${fieldConfig.name}`,
+                        }}
+                        isReview={isReview}
+                      />
+                    </Grid>
+                  ))}
+                  {!isReview && (
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => remove(fieldIndex)}
+                        sx={{ marginTop: "10px" }}
+                      >
+                        Remove Row
+                      </Button>
+                    </Grid>
+                  )}
+                </Grid>
+              ))}
+              {!isReview && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() =>
+                    append(config.fields.reduce((acc, field) => {
+                      acc[field.name] = "";
+                      return acc;
+                    }, {}))
+                  }
+                  sx={{ marginTop: "10px" }}
+                >
+                  Add Row
+                </Button>
+              )}
+            </Grid>
+          );
+        } else {
+          return (
+            <Grid item xs={12} key={config.name}>
+              <DynamicFormField
+                fieldConfig={config}
+                isReview={isReview}
+              />
+            </Grid>
+          );
+        }
+      })}
+    </Grid>
+  );
+};
+
+export default HealthComponent;
+3. Create PlanComponent
+The PlanComponent follows the same structure but with its own configuration.
+
+4. Reusable DynamicFormField Component
+Update DynamicFormField to dynamically handle fields based on the fieldConfig.
+
+tsx
+Copy code
+import { TextField } from "@mui/material";
+import { useController } from "react-hook-form";
+
+interface DynamicFormFieldProps {
+  fieldConfig: { name: string; label: string; type: string };
+  isReview: boolean;
+}
+
+const DynamicFormField: React.FC<DynamicFormFieldProps> = ({
+  fieldConfig,
+  isReview,
+}) => {
+  const { field } = useController({
+    name: fieldConfig.name,
+    defaultValue: "",
+  });
+
+  return (
+    <TextField
+      {...field}
+      label={fieldConfig.label}
+      type={fieldConfig.type}
+      disabled={isReview}
+      variant="outlined"
+      fullWidth
+      sx={{ marginBottom: "15px" }}
+    />
+  );
+};
+
+export default DynamicFormField;
+5. Integrate in Enrollment Page
+The Enrollment page renders the HealthComponent and other components like PlanComponent.
 
 tsx
 Copy code
@@ -15,23 +160,23 @@ import { Button } from "@mui/material";
 const Enrollment: React.FC = () => {
   const methods = useForm({
     defaultValues: {
-      healthInfoArray: [{ field1: "", field2: "" }], // Default values for health
-      planInfoArray: [{ planName: "", premium: "" }], // Default values for plan
+      prescribedMedications: [],
+      reasonForMedications: "",
     },
   });
 
-  const { handleSubmit, watch } = methods;
+  const { handleSubmit } = methods;
 
   const onSubmit = (data: any) => {
-    console.log("Submitted Form Data:", data); // All form data
+    console.log("Submitted Form Data:", data);
   };
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <h1>Enrollment Page</h1>
-        <HealthComponent />
-        <PlanComponent />
+        <HealthComponent isReview={false} />
+        <PlanComponent isReview={false} />
         <Button
           type="submit"
           variant="contained"
@@ -46,152 +191,29 @@ const Enrollment: React.FC = () => {
 };
 
 export default Enrollment;
-2. Create the HealthComponent
-This component will use the reusable DynamicForm to manage fields specific to health information.
-
-tsx
-Copy code
-import DynamicForm from "./DynamicForm";
-
-const HealthComponent: React.FC = () => {
-  const healthFieldConfig = [
-    { name: "field1", label: "Field 1", defaultValue: "" },
-    { name: "field2", label: "Field 2", defaultValue: "" },
-  ];
-
-  return (
-    <div>
-      <h2>Health Information</h2>
-      <DynamicForm name="healthInfoArray" fieldConfig={healthFieldConfig} />
-    </div>
-  );
-};
-
-export default HealthComponent;
-3. Create the PlanComponent
-Similar to HealthComponent, this component will use the DynamicForm for plan-specific fields.
-
-tsx
-Copy code
-import DynamicForm from "./DynamicForm";
-
-const PlanComponent: React.FC = () => {
-  const planFieldConfig = [
-    { name: "planName", label: "Plan Name", defaultValue: "" },
-    { name: "premium", label: "Premium", defaultValue: "" },
-  ];
-
-  return (
-    <div>
-      <h2>Plan Information</h2>
-      <DynamicForm name="planInfoArray" fieldConfig={planFieldConfig} />
-    </div>
-  );
-};
-
-export default PlanComponent;
-4. Create the Reusable DynamicForm
-The DynamicForm will manage dynamic rows for the given name (e.g., healthInfoArray, planInfoArray) and field configurations.
-
-tsx
-Copy code
-import { useFieldArray, useFormContext } from "react-hook-form";
-import { Grid, TextField, Button } from "@mui/material";
-
-interface DynamicFormProps {
-  name: string;
-  fieldConfig: { name: string; label: string; defaultValue: string }[];
-}
-
-const DynamicForm: React.FC<DynamicFormProps> = ({ name, fieldConfig }) => {
-  const { control, register } = useFormContext();
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name, // Dynamic name for the field array
-  });
-
-  const addRow = () => {
-    const newRow = fieldConfig.reduce((acc, field) => {
-      acc[field.name] = field.defaultValue || "";
-      return acc;
-    }, {});
-    append(newRow);
-  };
-
-  return (
-    <Grid container spacing={3}>
-      {fields.map((item, index) => (
-        <Grid item xs={12} key={item.id}>
-          {fieldConfig.map((field) => (
-            <TextField
-              key={field.name}
-              label={field.label}
-              {...register(`${name}[${index}].${field.name}`)}
-              variant="outlined"
-              fullWidth
-              sx={{ marginBottom: "15px" }}
-            />
-          ))}
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={() => remove(index)}
-            sx={{ marginTop: "10px" }}
-          >
-            Remove Row
-          </Button>
-        </Grid>
-      ))}
-      <Grid item xs={12}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addRow}
-          sx={{ marginTop: "10px" }}
-        >
-          Add Row
-        </Button>
-      </Grid>
-    </Grid>
-  );
-};
-
-export default DynamicForm;
-Step-by-Step Changes Explanation
-Parent Page (Enrollment.tsx)
-
-Sets up the useForm context with default values for healthInfoArray and planInfoArray.
-Uses FormProvider to share the useForm methods with child components.
-Child Components (HealthComponent and PlanComponent)
-
-Both consume the DynamicForm component with their respective name (healthInfoArray or planInfoArray) and field configurations.
-DynamicForm
-
-Manages dynamic rows using useFieldArray.
-Handles append and remove to dynamically add or remove rows.
-Dynamically generates form fields based on the provided fieldConfig.
+Final Structure
+Global Form Context: Managed in Enrollment using useForm and FormProvider.
+Reusable Dynamic Form Fields: Configured in ADD_MORE and rendered using DynamicFormField.
+Dynamic Rows for fieldArray: Managed using useFieldArray in the HealthComponent and PlanComponent.
 Resulting Behavior
-Dynamic Rows: Users can add/remove rows in both HealthComponent and PlanComponent.
-Seamless Form Submission: On submitting the Enrollment form, the dynamic rows from both components are included in the final formData.
-Reusability: The DynamicForm can be reused for other components (e.g., DentalComponent, VisionComponent) by passing the respective name and fieldConfig.
-Final Form Data on Submission
-When submitted, the form data will look like:
+Dynamic Rendering:
 
+Renders text and fieldArray fields dynamically from ADD_MORE.
+Add/Remove Rows:
+
+fieldArray fields support adding/removing rows.
+Form Submission:
+
+Submits data in the structure:
 json
 Copy code
 {
-  "healthInfoArray": [
-    { "field1": "value1", "field2": "value2" },
-    { "field1": "value3", "field2": "value4" }
+  "prescribedMedications": [
+    { "medication": "Aspirin", "dosage": "100mg" }
   ],
-  "planInfoArray": [
-    { "planName": "Gold Plan", "premium": "200" },
-    { "planName": "Silver Plan", "premium": "150" }
-  ]
+  "reasonForMedications": "Headache"
 }
-Let me know if you need further clarification!
-
+Let me know if you need further assistance!
 
 
 
