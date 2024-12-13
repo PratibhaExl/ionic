@@ -1,4 +1,160 @@
 
+____first approach 
+export const PLAN_ELIGIBILITY_FIELDS_ARRAY: FieldConfig[] = [
+  {
+    type: 'radio',
+    name: 'MailingOption',
+    label: 'Do you want to add a mailing address?',
+    options: [
+      { label: 'Yes', value: 'yes' },
+      { label: 'No', value: 'no' },
+    ],
+    rules: { required: 'Mailing option is required' },
+  },
+  {
+    type: 'text',
+    name: 'MailingAddress',
+    label: 'Mailing Address',
+    rules: { required: 'Mailing address is required' },
+    visibilityDependency: 'MailingOption', // Depends on the radio field
+    visibilityValue: 'yes', // Visible only if the radio field's value is 'yes'
+  },
+  {
+    type: 'text',
+    name: 'MailingCity',
+    label: 'City',
+    rules: { required: 'City is required' },
+    visibilityDependency: 'MailingOption',
+    visibilityValue: 'yes',
+  },
+  {
+    type: 'text',
+    name: 'MailingState',
+    label: 'State',
+    rules: { required: 'State is required' },
+    visibilityDependency: 'MailingOption',
+    visibilityValue: 'yes',
+  },
+];
+
+
+
+
+import React from 'react';
+import {
+  FormControl,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  TextField,
+  FormLabel,
+  FormHelperText,
+} from '@mui/material';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+
+interface FieldOption {
+  label: string;
+  value: string;
+}
+
+interface FieldConfig {
+  type: 'text' | 'radio';
+  name: string;
+  label: string;
+  options?: FieldOption[];
+  rules?: any;
+  visibilityDependency?: string; // Field depends on this name
+  visibilityValue?: string; // Field is visible when dependency has this value
+}
+
+interface DynamicFormFieldProps {
+  fieldConfig: FieldConfig;
+}
+
+const DynamicFormField: React.FC<DynamicFormFieldProps> = ({ fieldConfig }) => {
+  const { control, errors } = useFormContext();
+
+  // Use useWatch to monitor the value of the dependent field
+  const dependentValue = useWatch({
+    control,
+    name: fieldConfig.visibilityDependency,
+  });
+
+  // Check if the field should be visible
+  const isVisible =
+    !fieldConfig.visibilityDependency || dependentValue === fieldConfig.visibilityValue;
+
+  // If the field is not visible, return null
+  if (!isVisible) {
+    return null;
+  }
+
+  if (fieldConfig.type === 'radio') {
+    return (
+      <FormControl component="fieldset" error={Boolean(errors[fieldConfig.name])}>
+        <FormLabel component="legend">{fieldConfig.label}</FormLabel>
+        <Controller
+          name={fieldConfig.name}
+          control={control}
+          rules={fieldConfig.rules}
+          render={({ field }) => (
+            <RadioGroup {...field}>
+              {fieldConfig.options?.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+          )}
+        />
+        {errors[fieldConfig.name] && (
+          <FormHelperText>{errors[fieldConfig.name].message}</FormHelperText>
+        )}
+      </FormControl>
+    );
+  }
+
+  if (fieldConfig.type === 'text') {
+    return (
+      <Controller
+        name={fieldConfig.name}
+        control={control}
+        rules={fieldConfig.rules}
+        render={({ field }) => (
+          <TextField
+            {...field}
+            fullWidth
+            margin="normal"
+            label={fieldConfig.label}
+            error={Boolean(errors[fieldConfig.name])}
+            helperText={errors[fieldConfig.name]?.message}
+          />
+        )}
+      />
+    );
+  }
+
+  return null;
+};
+
+export default DynamicFormField;
+
+
+
+
+
+
+
+
+
+
+
+
+
+---second approach 
 
 
 export const PLAN_ELIGIBILITY_FIELDS_ARRAY: FieldConfig[] = [
