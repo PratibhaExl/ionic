@@ -52,4 +52,47 @@
     ></ngx-datatable-footer>
   </ion-footer>
 </div>
+
+
+
+
+.datatable-container {
+  padding: 20px;
+}
+
+.search-bar {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-input {
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+}
+
+.ion-icon {
+  font-size: 18px;
+  margin-left: 5px;
+}
+
+
+
+      
     
