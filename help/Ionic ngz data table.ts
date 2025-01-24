@@ -94,5 +94,111 @@
 
 
 
+
+
+
+
+
+<div>
+  <!-- Search -->
+  <input
+    type="text"
+    placeholder="Search..."
+    class="search-input"
+    (input)="onSearch($event.target.value)"
+  />
+
+  <!-- Data Table -->
+  <ngx-datatable
+    class="material"
+    [rows]="filteredRows"
+    [headerHeight]="50"
+    [footerHeight]="50"
+    [rowHeight]="50"
+    [scrollbarV]="false"
+    [limit]="pageSize"
+    [count]="rows.length"
+    [offset]="currentPage - 1"
+    (page)="setPage($event)"
+  >
+    <ngx-datatable-column name="File Name" prop="FileName" [width]="150"></ngx-datatable-column>
+    <ngx-datatable-column name="Actions" [width]="100">
+      <ng-template ngx-datatable-cell-template let-row="row">
+        <ion-button fill="clear" color="primary" class="download-btn" (click)="onDownload(row)">
+          <ion-icon name="download-outline"></ion-icon>
+        </ion-button>
+      </ng-template>
+    </ngx-datatable-column>
+  </ngx-datatable>
+</div>
+
+
+
+
+/* General Table Styling */
+ngx-datatable.material {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Search Input Styling */
+.search-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Action Button Styling */
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pagination Styling */
+.ngx-datatable-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Icon Styling */
+ion-icon, mat-icon {
+  font-size: 18px;
+  vertical-align: middle;
+          }
+
+
+
+
+      setPage(event: any): void {
+  this.currentPage = event.offset + 1;
+  const start = event.offset * this.pageSize;
+  const end = start + this.pageSize;
+  this.filteredRows = this.rows.slice(start, end);
+}
+
+
+onSearch(searchText: string): void {
+  this.filteredRows = this.rows.filter(row => 
+    Object.values(row).some(value =>
+      value.toString().toLowerCase().includes(searchText.toLowerCase())
+    )
+  );
+}
+
+
+
+      
+
+      
+
+
+
+
+
+
       
     
