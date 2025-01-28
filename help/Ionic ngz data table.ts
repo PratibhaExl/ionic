@@ -197,6 +197,87 @@ onSearch(searchText: string): void {
 
 
 
+ionic file convert into pdf
+
+
+import { Component } from '@angular/core';
+import { jsPDF } from 'jspdf';
+
+@Component({
+  selector: 'app-file-upload',
+  templateUrl: './file-upload.component.html',
+  styleUrls: ['./file-upload.component.scss'],
+})
+export class FileUploadComponent {
+  uploadedDocuments: File[] = [];
+  maxFilesAllowed: number = 5;
+
+  async onFileSelected(event: any): Promise<void> {
+    if (this.uploadedDocuments.length >= this.maxFilesAllowed) {
+      this.showAlertMessage('Only a maximum of 5 files is allowed.');
+      return;
+    }
+
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) {
+      return;
+    }
+
+    const isValid = this.validateFile(selectedFile);
+    if (!isValid.valid) {
+      this.showAlertMessage(isValid.message);
+      return;
+    }
+
+    // Convert the file to PDF
+    const pdfBase64 = await this.convertToPDF(selectedFile);
+
+    if (pdfBase64) {
+      this.uploadedDocuments.push(selectedFile);
+      console.log('Base64 PDF:', pdfBase64);
+    }
+  }
+
+  validateFile(file: File): { valid: boolean; message: string } {
+    const allowedExtensions = ['jpeg', 'jpg', 'png'];
+    const fileSizeLimit = 5 * 1024 * 1024; // 5 MB
+
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    if (!allowedExtensions.includes(fileExtension || '')) {
+      return { valid: false, message: 'Only JPEG, JPG, and PNG files are allowed.' };
+    }
+
+    if (file.size > fileSizeLimit) {
+      return { valid: false, message: 'File size must not exceed 5 MB.' };
+    }
+
+    return { valid: true, message: '' };
+  }
+
+  async convertToPDF(file: File): Promise<string | null> {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const imageBase64 = reader.result as string;
+
+        const pdf = new jsPDF();
+        pdf.addImage(imageBase64, 'JPEG', 10, 10, 180, 160); // Adjust dimensions as needed
+        const pdfBase64 = pdf.output('datauristring'); // Convert PDF to Base64
+
+        resolve(pdfBase64);
+      };
+      reader.onerror = () => {
+        this.showAlertMessage('Error reading the file.');
+        resolve(null);
+      };
+    });
+  }
+
+  showAlertMessage(message: string): void {
+    alert(message); // Replace with Ionic AlertController for better UI
+  }
+}
 
 
 
