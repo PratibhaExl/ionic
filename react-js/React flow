@@ -1,22 +1,28 @@
-
-
 import React, { useState } from "react";
 import ForkLeftOutlinedIcon from "@mui/icons-material/ForkLeftOutlined";
 
-const TriangleContent = ({ data, schedule, index }) => {
+const TriangleContent = ({ data, index, existingNodes, setExistingNodes }) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: index * 60, y: 50 }); // Auto-position nodes
 
-  const handleDragStart = (event) => {
+  const handleDragStart = () => {
     setIsDragging(true);
   };
 
   const handleDragEnd = (event) => {
     setIsDragging(false);
-    setPosition({
-      x: event.clientX - 25, // Adjust for center alignment
-      y: event.clientY - 25,
+    let newX = event.clientX - 25; // Adjust for center
+    let newY = event.clientY - 25;
+
+    // Check for collisions and adjust
+    existingNodes.forEach((node) => {
+      if (Math.abs(node.x - newX) < 60 && Math.abs(node.y - newY) < 60) {
+        newX += 70; // Shift right if overlapping
+      }
     });
+
+    setPosition({ x: newX, y: newY });
+    setExistingNodes([...existingNodes, { x: newX, y: newY }]);
   };
 
   return (
@@ -27,8 +33,7 @@ const TriangleContent = ({ data, schedule, index }) => {
         height: 50,
         backgroundColor: "rgb(232, 151, 8)",
         transform: "rotate(45deg)",
-        position: isDragging ? "fixed" : "relative",
-        zIndex: isDragging ? 9999 : index, // Ensure stacking order
+        position: "absolute",
         left: position.x,
         top: position.y,
         cursor: isDragging ? "grabbing" : "grab",
@@ -45,7 +50,6 @@ const TriangleContent = ({ data, schedule, index }) => {
             fontSize: 40,
           }}
         />
-        {/* Top Right Label */}
         <div style={{ position: "absolute", right: "-80px", top: "0px" }}>
           <p>
             <span style={{ fontWeight: "bold" }}>
@@ -53,8 +57,6 @@ const TriangleContent = ({ data, schedule, index }) => {
             </span>
           </p>
         </div>
-
-        {/* Bottom Right Label */}
         <div style={{ position: "absolute", right: "-100px", top: "15px" }}>
           Choice
         </div>
@@ -63,21 +65,20 @@ const TriangleContent = ({ data, schedule, index }) => {
   );
 };
 
-export default TriangleContent;
+export default function TriangleContainer() {
+  const [nodes, setNodes] = useState([]);
 
-
-.diamond-node {
-  position: relative;
-  cursor: grab;
-  transition: transform 0.2s ease-out;
+  return (
+    <div style={{ width: "100%", height: "500px", position: "relative" }}>
+      {[...Array(5)].map((_, index) => (
+        <TriangleContent
+          key={index}
+          index={index}
+          existingNodes={nodes}
+          setExistingNodes={setNodes}
+          data={{ widgetData: { MidgetName: `Node ${index + 1}` } }}
+        />
+      ))}
+    </div>
+  );
 }
-
-.diamond-node.dragging {
-  position: fixed !important;
-  z-index: 9999;
-  opacity: 0.8;
-  pointer-events: none;
-  cursor: grabbing;
-}
-
-
