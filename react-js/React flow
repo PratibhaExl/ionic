@@ -1,11 +1,23 @@
 
 
-
 import React, { useState } from "react";
 import ForkLeftOutlinedIcon from "@mui/icons-material/ForkLeftOutlined";
 
-const TriangleContent = ({ data, schedule }) => {
+const TriangleContent = ({ data, schedule, index }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleDragStart = (event) => {
+    setIsDragging(true);
+  };
+
+  const handleDragEnd = (event) => {
+    setIsDragging(false);
+    setPosition({
+      x: event.clientX - 25, // Adjust for center alignment
+      y: event.clientY - 25,
+    });
+  };
 
   return (
     <div
@@ -15,10 +27,15 @@ const TriangleContent = ({ data, schedule }) => {
         height: 50,
         backgroundColor: "rgb(232, 151, 8)",
         transform: "rotate(45deg)",
-        position: "relative",
+        position: isDragging ? "fixed" : "relative",
+        zIndex: isDragging ? 9999 : index, // Ensure stacking order
+        left: position.x,
+        top: position.y,
+        cursor: isDragging ? "grabbing" : "grab",
+        transition: isDragging ? "none" : "transform 0.2s ease-out",
       }}
-      onMouseDown={() => setIsDragging(true)}
-      onMouseUp={() => setIsDragging(false)}
+      onMouseDown={handleDragStart}
+      onMouseUp={handleDragEnd}
     >
       <div className="diamond-content">
         <ForkLeftOutlinedIcon
@@ -49,17 +66,18 @@ const TriangleContent = ({ data, schedule }) => {
 export default TriangleContent;
 
 
-
 .diamond-node {
   position: relative;
   cursor: grab;
-  transition: transform 0.1s ease-out;
+  transition: transform 0.2s ease-out;
 }
 
 .diamond-node.dragging {
-  position: absolute !important;
+  position: fixed !important;
   z-index: 9999;
   opacity: 0.8;
   pointer-events: none;
   cursor: grabbing;
 }
+
+
