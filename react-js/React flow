@@ -191,6 +191,183 @@ export default Sidebar;
 }
 
 
+updating 2
+
+npm install react-draggable react-resizable
+
+import React, { useState } from "react";
+import Draggable from "react-draggable";
+import { ResizableBox } from "react-resizable";
+import { Leva, useControls } from "leva";
+import { FaBars } from "react-icons/fa";
+import NodeTextEditor from "./NodeTextEditor";
+import DataConnectPopUp from "./DataConnectPopUp";
+import "./Sidebar.css";
+
+const Sidebar: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [width, setWidth] = useState(250);
+  const [isEditingNode, setIsEditingNode] = useState(false);
+  const [isDataConnectClick, setIsDataConnectClick] = useState(false);
+  const [currentNode, setCurrentNode] = useState<any>(null);
+  const [editType, setEditType] = useState<string>("");
+
+  // Leva Controls
+  useControls({
+    Sidebar: {
+      value: isExpanded ? "Expanded" : "Collapsed",
+      options: ["Expanded", "Collapsed"],
+      onChange: () => setIsExpanded(!isExpanded),
+    },
+    Menu: {
+      value: "",
+      options: ["Edit Node", "Data Connect"],
+      onChange: (value) => {
+        if (value === "Edit Node") setIsEditingNode(true);
+        if (value === "Data Connect") setIsDataConnectClick(true);
+      },
+    },
+    Brightness: { value: 50, min: 0, max: 100 },
+    Contrast: { value: 70, min: 0, max: 100 },
+  });
+
+  return (
+    <Draggable handle=".drag-handle">
+      <ResizableBox
+        width={width}
+        height={window.innerHeight - 50}
+        axis="x"
+        minConstraints={[60, window.innerHeight - 50]}
+        maxConstraints={[400, window.innerHeight - 50]}
+        onResizeStop={(e, data) => setWidth(data.size.width)}
+      >
+        <div className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`} style={{ width }}>
+          {/* Drag Handle & Toggle Button */}
+          <div className="drag-handle">
+            <button className="toggle-btn" onClick={() => setIsExpanded(!isExpanded)}>
+              <FaBars />
+            </button>
+          </div>
+
+          {/* Sidebar Menu List */}
+          {isExpanded && (
+            <div className="menu-list">
+              <p onClick={() => setIsEditingNode(true)}>Edit Node</p>
+              <p onClick={() => setIsDataConnectClick(true)}>Data Connect</p>
+            </div>
+          )}
+
+          {/* Leva Panel (Shows only when expanded) */}
+          {isExpanded && <Leva collapsed={!isExpanded} />}
+
+          {/* Render NodeTextEditor when clicked */}
+          {isEditingNode && currentNode && (
+            <NodeTextEditor
+              isEditingNode={isEditingNode}
+              setIsEditingNode={() => setIsEditingNode(false)}
+              node={currentNode}
+              editType={editType}
+            />
+          )}
+
+          {/* Render DataConnectPopUp when clicked */}
+          {isDataConnectClick && currentNode && (
+            <DataConnectPopUp
+              IsDataConnectClick={isDataConnectClick}
+              setIsDataConnectClick={() => setIsDataConnectClick(false)}
+              node={currentNode}
+            />
+          )}
+        </div>
+      </ResizableBox>
+    </Draggable>
+  );
+};
+
+export default Sidebar;
+
+
+css
+
+.sidebar-container {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  height: auto;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: white;
+  transition: width 0.3s ease-in-out, transform 0.3s ease;
+  overflow: hidden;
+  padding: 10px;
+  cursor: grab;
+  border-radius: 8px;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.expanded {
+  width: 250px;
+}
+
+.collapsed {
+  width: 60px;
+}
+
+/* Toggle Button */
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.toggle-btn:hover {
+  transform: rotate(90deg);
+}
+
+/* Sidebar Menu */
+.menu-list p {
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s ease-in-out;
+}
+
+.menu-list p:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Icons inside menu */
+.menu-icon {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+/* Draggable Handle */
+.drag-handle {
+  cursor: move;
+  padding: 10px;
+  background: #222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px 8px 0 0;
+  transition: background 0.3s ease-in-out;
+}
+
+.drag-handle:hover {
+  background: #444;
+}
+
+/* Smooth animation for collapsed menu */
+.collapsed .menu-list {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
 
 
 
