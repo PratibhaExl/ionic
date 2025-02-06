@@ -1,3 +1,74 @@
+leva update 
+
+import React, { useState } from "react";
+import { Leva, useControls, folder } from "leva";
+import NodeTextEditor from "./NodeTextEditor";
+import DataConnectPopUp from "./DataConnectPopUp";
+
+const LevaControls: React.FC = () => {
+  const [isEditingNode, setIsEditingNode] = useState(false);
+  const [isDataConnectClick, setIsDataConnectClick] = useState(false);
+  const [currentNode, setCurrentNode] = useState<any>(null);
+  const [editType, setEditType] = useState<string>("");
+
+  // Leva Controls with Expandable Sections
+  useControls({
+    General: folder({
+      Brightness: { value: 50, min: 0, max: 100 },
+      Contrast: { value: 70, min: 0, max: 100 },
+    }),
+
+    "Edit Node": folder(
+      {
+        Toggle: {
+          value: false,
+          onChange: (value) => setIsEditingNode(value),
+        },
+        Editor: isEditingNode
+          ? () => (
+              <NodeTextEditor
+                isEditingNode={isEditingNode}
+                setIsEditingNode={() => setIsEditingNode(false)}
+                node={currentNode}
+                editType={editType}
+              />
+            )
+          : null,
+      },
+      { collapsed: true }
+    ),
+
+    "Data Connect": folder(
+      {
+        Toggle: {
+          value: false,
+          onChange: (value) => setIsDataConnectClick(value),
+        },
+        PopUp: isDataConnectClick
+          ? () => (
+              <DataConnectPopUp
+                IsDataConnectClick={isDataConnectClick}
+                setIsDataConnectClick={() => setIsDataConnectClick(false)}
+                node={currentNode}
+              />
+            )
+          : null,
+      },
+      { collapsed: true }
+    ),
+  });
+
+  return <Leva />;
+};
+
+export default LevaControls;
+
+
+
+
+
+
+
 
 side menu
 npm install leva 
