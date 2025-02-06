@@ -1,3 +1,35 @@
+
+
+import { useRef, useState } from 'react';
+import * as THREE from 'three';
+
+interface PolyhedronProps {
+  polyhedron: THREE.BufferGeometry[]; // Assuming polyhedron is an array of geometries
+  color: string;
+  [key: string]: any; // For additional props like position, rotation, etc.
+}
+
+export default function Polyhedron({ polyhedron, color, ...props }: PolyhedronProps) {
+  const ref = useRef<THREE.Mesh | null>(null);
+  const [count, setCount] = useState(2);
+
+  console.log(polyhedron[count]?.uuid); // Use optional chaining to prevent errors
+
+  return (
+    <mesh
+      {...props}
+      ref={ref}
+      onPointerDown={() => setCount((count + 1) % polyhedron.length)}
+      geometry={polyhedron[count]} // Corrected JSX syntax
+    >
+      <meshBasicMaterial color={color} wireframe />
+    </mesh>
+  );
+}
+
+
+
+
 leva update 
 
 import React, { useState } from "react";
