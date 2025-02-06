@@ -1,4 +1,33 @@
 
+import React, { useMemo, useState } from "react";
+import { Leva, useControls } from "leva";
+import WidgetLibrary from "./WidgetLibrary";
+
+export default function WidgetMenu() {
+  // Define available widgets (referencing polyhedron as a structure)
+  const widgetOptions = useMemo(() => ["WidgetA", "WidgetB", "WidgetC"], []);
+
+  // Use Leva controls to create a selection dropdown
+  const { selectedWidget } = useControls("Widgets Menu", {
+    selectedWidget: { options: widgetOptions, value: widgetOptions[0] },
+  });
+
+  return (
+    <>
+      <Leva />
+      
+      {/* Dynamically render the selected widget */}
+      {selectedWidget === "WidgetA" && <WidgetLibrary type="A" />}
+      {selectedWidget === "WidgetB" && <WidgetLibrary type="B" />}
+      {selectedWidget === "WidgetC" && <WidgetLibrary type="C" />}
+    </>
+  );
+}
+
+
+
+
+
 
 import { useRef, useState } from 'react';
 import * as THREE from 'three';
