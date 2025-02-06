@@ -1,84 +1,84 @@
+
+side menu
+npm install leva 
+
+sidebar.tsx
+
 import React, { useState } from "react";
-import ForkLeftOutlinedIcon from "@mui/icons-material/ForkLeftOutlined";
+import { Leva, useControls } from "leva";
+import { FaBars } from "react-icons/fa";
+import "./Sidebar.css"; // Add styles if needed
 
-const TriangleContent = ({ data, index, existingNodes, setExistingNodes }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState({ x: index * 60, y: 50 }); // Auto-position nodes
+const Sidebar: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
 
-  const handleDragStart = () => {
-    setIsDragging(true);
-  };
-
-  const handleDragEnd = (event) => {
-    setIsDragging(false);
-    let newX = event.clientX - 25; // Adjust for center
-    let newY = event.clientY - 25;
-
-    // Check for collisions and adjust
-    existingNodes.forEach((node) => {
-      if (Math.abs(node.x - newX) < 60 && Math.abs(node.y - newY) < 60) {
-        newX += 70; // Shift right if overlapping
-      }
-    });
-
-    setPosition({ x: newX, y: newY });
-    setExistingNodes([...existingNodes, { x: newX, y: newY }]);
-  };
+  // Leva controls (example settings)
+  useControls({
+    Brightness: { value: 50, min: 0, max: 100 },
+    Contrast: { value: 70, min: 0, max: 100 },
+  });
 
   return (
-    <div
-      className={`diamond-node ${isDragging ? "dragging" : ""}`}
-      style={{
-        width: 50,
-        height: 50,
-        backgroundColor: "rgb(232, 151, 8)",
-        transform: "rotate(45deg)",
-        position: "absolute",
-        left: position.x,
-        top: position.y,
-        cursor: isDragging ? "grabbing" : "grab",
-        transition: isDragging ? "none" : "transform 0.2s ease-out",
-      }}
-      onMouseDown={handleDragStart}
-      onMouseUp={handleDragEnd}
-    >
-      <div className="diamond-content">
-        <ForkLeftOutlinedIcon
-          style={{
-            color: "white",
-            transform: "rotate(180deg)",
-            fontSize: 40,
-          }}
-        />
-        <div style={{ position: "absolute", right: "-80px", top: "0px" }}>
-          <p>
-            <span style={{ fontWeight: "bold" }}>
-              {data.widgetData?.MidgetName}
-            </span>
-          </p>
-        </div>
-        <div style={{ position: "absolute", right: "-100px", top: "15px" }}>
-          Choice
-        </div>
+    <div className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}>
+      <button className="toggle-btn" onClick={() => setIsExpanded(!isExpanded)}>
+        <FaBars />
+      </button>
+
+      {isExpanded && <Leva collapsed={false} />}
+    </div>
+  );
+};
+
+export default Sidebar;
+
+
+sidebar.css
+
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #333;
+  color: white;
+  transition: width 0.3s;
+  width: 250px; /* Default expanded width */
+  padding: 10px;
+}
+
+.sidebar-container.collapsed {
+  width: 60px; /* Collapsed width */
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+
+uses app.tsx
+
+
+import React from "react";
+import Sidebar from "./Sidebar";
+
+const App: React.FC = () => {
+  return (
+    <div>
+      <Sidebar />
+      <div style={{ marginLeft: "260px", padding: "20px" }}>
+        <h1>React Leva Sidebar</h1>
+        <p>Click the icon to toggle the sidebar.</p>
       </div>
     </div>
   );
 };
 
-export default function TriangleContainer() {
-  const [nodes, setNodes] = useState([]);
+export default App;
 
-  return (
-    <div style={{ width: "100%", height: "500px", position: "relative" }}>
-      {[...Array(5)].map((_, index) => (
-        <TriangleContent
-          key={index}
-          index={index}
-          existingNodes={nodes}
-          setExistingNodes={setNodes}
-          data={{ widgetData: { MidgetName: `Node ${index + 1}` } }}
-        />
-      ))}
-    </div>
-  );
-}
+
+
