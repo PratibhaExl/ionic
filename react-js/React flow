@@ -80,5 +80,119 @@ const App: React.FC = () => {
 
 export default App;
 
+†*******
+
+updating 
+
+
+import React, { useState } from "react";
+import { Leva, useControls } from "leva";
+import { FaBars } from "react-icons/fa";
+import NodeTextEditor from "./NodeTextEditor";
+import DataConnectPopUp from "./DataConnectPopUp";
+import "./Sidebar.css";
+
+const Sidebar: React.FC = () => {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isEditingNode, setIsEditingNode] = useState(false);
+  const [isDataConnectClick, setIsDataConnectClick] = useState(false);
+  const [currentNode, setCurrentNode] = useState<any>(null);
+  const [editType, setEditType] = useState<string>("");
+
+  // UseControls to manage Sidebar Menu List and Sliders
+  useControls({
+    Sidebar: {
+      value: isExpanded ? "Expanded" : "Collapsed",
+      options: ["Expanded", "Collapsed"],
+      onChange: () => setIsExpanded(!isExpanded),
+    },
+    Menu: {
+      value: "",
+      options: ["Edit Node", "Data Connect"],
+      onChange: (value) => {
+        if (value === "Edit Node") setIsEditingNode(true);
+        if (value === "Data Connect") setIsDataConnectClick(true);
+      },
+    },
+    Brightness: { value: 50, min: 0, max: 100 },
+    Contrast: { value: 70, min: 0, max: 100 },
+  });
+
+  return (
+    <div className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}>
+      <button className="toggle-btn" onClick={() => setIsExpanded(!isExpanded)}>
+        <FaBars />
+      </button>
+
+      {/* Leva Panel (Includes Sidebar State, Menu List, and Controls) */}
+      <Leva collapsed={!isExpanded} />
+
+      {/* Render NodeTextEditor when clicked */}
+      {isEditingNode && currentNode && (
+        <NodeTextEditor
+          isEditingNode={isEditingNode}
+          setIsEditingNode={() => setIsEditingNode(false)}
+          node={currentNode}
+          editType={editType}
+        />
+      )}
+
+      {/* Render DataConnectPopUp when clicked */}
+      {isDataConnectClick && currentNode && (
+        <DataConnectPopUp
+          IsDataConnectClick={isDataConnectClick}
+          setIsDataConnectClick={() => setIsDataConnectClick(false)}
+          node={currentNode}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Sidebar;
+
+
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #333;
+  color: white;
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.expanded {
+  width: 250px; /* Sidebar expanded width */
+}
+
+.collapsed {
+  width: 60px; /* Sidebar collapsed width */
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  margin: 10px;
+}
+
+/* Smooth animation for menu items */
+.menu-item {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.collapsed .menu-item {
+  opacity: 0;
+}
+
+
+
+
+
 
 
