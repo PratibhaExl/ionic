@@ -1,4 +1,47 @@
 
+leva ui
+
+import { useControls } from "leva";
+import { useState, useEffect } from "react";
+
+function DynamicNestedMenu() {
+  const [menuData, setMenuData] = useState({});
+
+  useEffect(() => {
+    // Simulating fetching nested menu items dynamically
+    setTimeout(() => {
+      setMenuData({
+        "General Settings": {
+          "Brightness": { value: 50, min: 0, max: 100 },
+          "Contrast": { value: 75, min: 0, max: 100 },
+        },
+        "Advanced Settings": {
+          "Gamma": { value: 1.2, min: 0.5, max: 3.0, step: 0.1 },
+          "Saturation": { value: 1, min: 0, max: 2 },
+        },
+        "Color Adjustments": {
+          "Red": { value: 100, min: 0, max: 255 },
+          "Green": { value: 100, min: 0, max: 255 },
+          "Blue": { value: 100, min: 0, max: 255 },
+        },
+      });
+    }, 1000);
+  }, []);
+
+  // Dynamically create nested Leva controls
+  useControls(menuData);
+
+  return null; // Leva handles the UI automatically
+}
+
+export default DynamicNestedMenu;
+
+
+
+
+
+
+
 import React, { useMemo, useState } from "react";
 import { Leva, useControls } from "leva";
 import WidgetLibrary from "./WidgetLibrary";
