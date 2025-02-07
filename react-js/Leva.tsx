@@ -1,4 +1,22 @@
 
+import { ReactNode } from "react";
+
+interface Widget {
+  WidgetId: string | number | null;
+  WidgetName: string;
+  WidgetType: string;
+  Content: string;
+  Question?: string;
+  TextEditor?: string;
+  AddToGroupNode?: string;
+  Icon?: ReactNode;
+  DefaultIcon?: ReactNode;
+  Category?: string;
+}
+
+
+
+
 const widgetList = {
   "Campaign Triggers": [
     { WidgetId: "14", WidgetName: "InBound Message", Category: "Campaign Triggers" },
