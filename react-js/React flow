@@ -1,4 +1,38 @@
 
+logic to update options leva
+
+import { useControls } from "leva";
+import { useMemo } from "react";
+
+function WidgetControl() {
+  // Extract widget names dynamically from widgetList
+  const widgetOptions = useMemo(() => {
+    let options = {};
+    Object.values(widgetList).forEach((widgets) => {
+      widgets.forEach(({ WidgetName }) => {
+        options[WidgetName] = {
+          name: WidgetName,
+          visible: true,
+          color: { value: "lime" },
+        };
+      });
+    });
+    return options;
+  }, []);
+
+  // UseControls with dynamically generated widget options
+  const controls = useControls(widgetOptions);
+
+  return null; // Leva automatically renders the controls
+}
+
+export default WidgetControl;
+
+
+
+
+
+
 leva ui
 
 import { useControls } from "leva";
