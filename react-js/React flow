@@ -4,29 +4,77 @@ logic to update options leva
 import { useControls } from "leva";
 import { useMemo } from "react";
 
+const widgetList = {
+  Utility: [
+    {
+      WidgetId: "1",
+      WidgetName: "Group",
+      WidgetType: "GroupNode",
+      Content: "GroupNode",
+      Question: "No",
+      TextEditor: "No",
+      Category: "Utility",
+    },
+    {
+      WidgetId: "2",
+      WidgetName: "Custom Question",
+      WidgetType: "CustomHandle IncrementNode",
+      Content: "Custom Handle IncrementNode",
+      Question: "Yes",
+      TextEditor: "No",
+      Category: "Utility",
+    },
+  ],
+  Decision: [
+    {
+      WidgetId: "3",
+      WidgetName: "Choice",
+      WidgetType: "ChoiceNode",
+      Content: "ChoiceNode",
+      Question: "Yes",
+      TextEditor: "Yes",
+      Category: "Decision",
+    },
+    {
+      WidgetId: "4",
+      WidgetName: "Multi Choice",
+      WidgetType: "MultiChoiceNode",
+      Content: "MultiChoiceNode",
+      Question: "Yes",
+      TextEditor: "No",
+      Category: "Decision",
+    },
+  ],
+};
+
 function WidgetControl() {
-  // Extract widget names dynamically from widgetList
+  // Generate Leva controls dynamically
   const widgetOptions = useMemo(() => {
     let options = {};
-    Object.values(widgetList).forEach((widgets) => {
+
+    Object.entries(widgetList).forEach(([category, widgets]) => {
+      options[category] = {};
+
       widgets.forEach(({ WidgetName }) => {
-        options[WidgetName] = {
+        options[category][WidgetName] = {
           name: WidgetName,
           visible: true,
           color: { value: "lime" },
         };
       });
     });
+
     return options;
   }, []);
 
-  // UseControls with dynamically generated widget options
-  const controls = useControls(widgetOptions);
+  // UseControls dynamically with nested categories
+  const controls = useControls(() => widgetOptions);
 
   return null; // Leva automatically renders the controls
 }
 
 export default WidgetControl;
+
 
 
 
