@@ -1,4 +1,21 @@
 
+function useDynamicControls() {
+  const layoutOptions = useMemo(() => {
+    return Object.entries(widgetList).reduce((acc, [category, widgets]) => {
+      acc[category] = {
+        value: widgets.length > 0 ? widgets[0].WidgetName : "Select an option",
+        options: widgets.map((widget) => widget.WidgetName),
+      };
+      return acc;
+    }, {} as Record<string, { value: string; options: string[] }>);
+  }, []);
+
+  return useControls(layoutOptions);
+}
+
+
+
+
 import { ReactNode } from "react";
 
 interface Widget {
