@@ -1,4 +1,80 @@
 
+function DynamicFlow() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [nodes, setNodes] = useNodesState([]);
+
+  // Generate dynamic Leva controls
+  const layoutOptions = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(categoryWidgets).map(([category, options]) => [
+        category,
+        {
+          value: selectedCategory === category ? options[0] : "Select a widget",
+          options: options,
+          onChange: () => setSelectedCategory(category), // Reset others on selection
+        },
+      ])
+    );
+  }, [selectedCategory]);
+
+  // Apply Leva controls
+  const selectedOptions = useControls({
+    ...layoutOptions,
+    "Add Root Node": button(() => addRootNode()),
+  });
+
+  // Function to add a node in React Flow
+  const addRootNode = () => {
+    if (!selectedCategory) {
+      alert("Please select a category first!");
+      return;
+    }
+
+    const selectedWidget = selectedOptions[selectedCategory];
+
+    if (!selectedWidget || selectedWidget.startsWith("Select")) {
+      alert("Please select a widget first!");
+      return;
+    }
+
+    const newNode = {
+      id: String(nodes.length + 1),
+      position: { x: Math.random() * 250, y: Math.random() * 250 },
+      data: { label: selectedWidget },
+      draggable: true,
+      deletable: true,
+    };
+
+    setNodes(prevNodes => [...prevNodes, newNode]);
+  };
+
+  return <ReactFlow nodes={nodes} />;
+}
+
+export default DynamicFlow;
+
+
+.leva-root {
+  max-width: 300px;
+  background-color: #2e2e2e; /* Dark theme */
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.leva-root .leva-controls {
+  color: white;
+}
+
+.leva-root .leva-input {
+  background-color: #444;
+  color: white;
+}
+
+
+
+
+
+
 function getCategoryWidgetNames(widgetList: Record<string, { WidgetName: string }[]>) {
   return Object.fromEntries(
     Object.entries(widgetList).map(([category, widgets]) => [
