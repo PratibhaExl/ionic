@@ -1,3 +1,41 @@
+
+/* Ensure these styles override Leva's default styles */
+:root {
+  /* Override Leva text color */
+  --leva-colors-text: white !important;
+  --leva-colors-background: #1e1e1e !important;
+  --leva-colors-accent1: #ffcc00 !important;
+  --leva-colors-accent2: #ff9900 !important;
+  --leva-colors-elevation1: #333 !important;
+  --leva-colors-highlight1: #f8b400 !important;
+}
+
+/* Override Leva input text color */
+.leva-c-dDhDOW input {
+  color: white !important;
+}
+
+/* Style Leva buttons */
+.leva-c-KvZkh-button {
+  background-color: #ffcc00 !important;
+  color: black !important;
+}
+
+/* Make Leva panel background dark */
+.leva-c-JzzMaI {
+  background-color: #222 !important;
+  border-radius: 8px !important;
+  padding: 10px !important;
+}
+
+/* Ensure these styles are applied */
+.leva-container {
+  all: unset !important;
+}
+
+
+
+
 /* Change text color inside Leva panel */
 .leva-root {
   --leva-colors-text: white;
