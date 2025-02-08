@@ -1,4 +1,38 @@
 
+import React, { useState, useMemo } from "react";
+import { useControls, button } from "leva";
+import ReactFlow, { useNodesState } from "reactflow";
+
+// Mock Widget List
+const widgetList: Record<string, { WidgetId: string; WidgetName: string }[]> = {
+  "Campaign Triggers": [
+    { WidgetId: "14", WidgetName: "InBound Message" },
+    { WidgetId: "15", WidgetName: "OutBound Call" },
+  ],
+  "Decision": [
+    { WidgetId: "16", WidgetName: "CheckLeadExists" },
+    { WidgetId: "17", WidgetName: "InBound Call" },
+  ],
+  "Sales": [
+    { WidgetId: "18", WidgetName: "Create New Lead" },
+    { WidgetId: "19", WidgetName: "Create SOA" },
+  ],
+};
+
+// Function to get categories with sorted widget names
+const getSortedCategoryWidgetNames = (widgetList: Record<string, { WidgetName: string }[]>) =>
+  Object.fromEntries(
+    Object.entries(widgetList).map(([category, widgets]) => [
+      category,
+      widgets.map(w => w.WidgetName).sort((a, b) => a.localeCompare(b)),
+    ])
+  );
+
+const categoryWidgets = getSortedCategoryWidgetNames(widgetList);
+
+
+
+
 function DynamicFlow() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [nodes, setNodes] = useNodesState([]);
