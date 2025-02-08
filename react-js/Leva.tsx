@@ -1,4 +1,19 @@
 
+function getCategoryWidgetNames(widgetList: Record<string, { WidgetName: string }[]>) {
+  return Object.fromEntries(
+    Object.entries(widgetList).map(([category, widgets]) => [
+      category,
+      widgets.map(widget => widget.WidgetName),
+    ])
+  );
+}
+
+// Example usage:
+const categoryWidgets = getCategoryWidgetNames(widgetList);
+console.log(categoryWidgets);
+
+
+
 function useDynamicControls() {
   const layoutOptions = useMemo(() => {
     return Object.entries(widgetList).reduce((acc, [category, widgets]) => {
