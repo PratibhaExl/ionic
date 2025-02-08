@@ -1,4 +1,61 @@
 
+
+function DynamicFlow() {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedWidget, setSelectedWidget] = useState<string | null>(null);
+  const [nodes, setNodes] = useNodesState([]);
+
+  // Generate dynamic Leva controls
+  const layoutOptions = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(categoryWidgets).map(([category, options]) => [
+        category,
+        {
+          value: selectedCategory === category ? selectedWidget || options[0] : "Select a widget",
+          options: options,
+          onChange: (value: string) => {
+            setSelectedCategory(category); // Update category
+            setSelectedWidget(value); // Update widget
+          },
+        },
+      ])
+    );
+  }, [selectedCategory, selectedWidget]);
+
+  // Apply Leva controls
+  const selectedOptions = useControls({
+    ...layoutOptions,
+    "Add Root Node": button(() => addRootNode()),
+  });
+
+  // Function to add a new node in React Flow
+  const addRootNode = () => {
+    if (!selectedCategory || !selectedWidget || selectedWidget.startsWith("Select")) {
+      alert("Please select a category and widget first!");
+      return;
+    }
+
+    const newNode = {
+      id: String(nodes.length + 1),
+      position: { x: Math.random() * 250, y: Math.random() * 250 },
+      data: { label: selectedWidget },
+      draggable: true,
+      deletable: true,
+    };
+
+    setNodes(prevNodes => [...prevNodes, newNode]); // Allow multiple additions
+  };
+
+  return <ReactFlow nodes={nodes} />;
+}
+
+export default DynamicFlow;
+
+
+
+
+
+
 import React, { useState, useMemo } from "react";
 import { useControls, button } from "leva";
 import ReactFlow, { useNodesState } from "reactflow";
