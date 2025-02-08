@@ -1,3 +1,27 @@
+/* Change text color inside Leva panel */
+.leva-root {
+  --leva-colors-text: white;
+  --leva-colors-highlight1: #ffcc00;
+  --leva-colors-highlight2: #ff9900;
+}
+
+/* Make Leva background dark */
+.leva-panel {
+  background-color: #333 !important;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+/* Customize input field text color */
+.leva-input {
+  color: white !important;
+}
+
+/* Button Styling */
+.leva-button {
+  background-color: #ffcc00 !important;
+  color: black !important;
+}
 
 
 function DynamicFlow() {
