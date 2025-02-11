@@ -1,4 +1,121 @@
 
+
+import React, { useState } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  TextField,
+  IconButton,
+  Typography,
+  Box,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+const WidgetAccordion = () => {
+  const [expanded, setExpanded] = useState<boolean>(true);
+
+  const handleToggle = () => {
+    setExpanded(!expanded);
+  };
+
+  return (
+    <Accordion expanded={expanded} sx={styles.accordion}>
+      {/* Header */}
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={styles.summary}
+        onClick={handleToggle}
+      >
+        {/* Left Arrow Icon */}
+        <IconButton sx={styles.icon}>
+          <ChevronLeftIcon />
+        </IconButton>
+
+        {/* Middle Menu Icon */}
+        <MenuIcon sx={styles.menuIcon} />
+
+        {/* Right Arrow Icon */}
+        <IconButton sx={styles.icon}>
+          <ChevronRightIcon />
+        </IconButton>
+
+        {/* Search Box on Right */}
+        <Box sx={styles.searchContainer}>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Search..."
+            sx={styles.searchInput}
+          />
+          <IconButton sx={styles.searchIcon}>
+            <SearchIcon />
+          </IconButton>
+        </Box>
+      </AccordionSummary>
+
+      {/* Accordion Content */}
+      <AccordionDetails>
+        <Typography>Widget Content Goes Here...</Typography>
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+export default WidgetAccordion;
+
+const styles = {
+  accordion: {
+    border: "1px solid #ccc",
+    borderRadius: "5px",
+    background: "#1e1e1e", // Dark background like Leva
+    color: "#ffffff",
+  },
+  summary: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    background: "#252525", // Slightly lighter than main background
+    color: "#ffffff",
+  },
+  icon: {
+    color: "#aaa", // Light gray for icons
+    "&:hover": { color: "#ffffff" },
+  },
+  menuIcon: {
+    color: "#ffffff",
+    fontSize: "1.5rem",
+    marginLeft: "10px",
+    marginRight: "10px",
+  },
+  searchContainer: {
+    display: "flex",
+    alignItems: "center",
+    background: "#333",
+    borderRadius: "4px",
+    padding: "2px 8px",
+  },
+  searchInput: {
+    background: "#444",
+    borderRadius: "4px",
+    color: "#fff",
+    input: { color: "#fff" },
+    "& fieldset": { border: "none" },
+  },
+  searchIcon: {
+    color: "#aaa",
+  },
+};
+
+
+
+
+
+
 import React from "react";
 import Draggable from "react-draggable";
 
