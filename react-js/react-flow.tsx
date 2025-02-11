@@ -1,5 +1,199 @@
 
 
+
+
+.widget-accordion {
+  width: 300px;
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border-radius: 5px;
+  background: #1e1e1e;
+  color: #ffffff;
+  user-select: none;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.accordion-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #252525;
+  padding: 8px 12px;
+  cursor: grab;
+}
+
+.accordion-summary:active {
+  cursor: grabbing;
+}
+
+.icon-button {
+  color: #aaa;
+  transition: color 0.3s;
+}
+
+.icon-button:hover {
+  color: #ffffff;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  cursor: grab;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background: #333;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.search-input {
+  display: none;
+  background: #444;
+  border-radius: 4px;
+  color: #fff;
+  outline: none;
+  padding: 4px;
+  border: none;
+  width: 120px;
+}
+
+.search-input.active {
+  display: block;
+}
+
+.search-icon {
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.search-icon:hover {
+  color: #ffffff;
+}
+
+.draggable {
+  position: absolute;
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  TextField,
+  IconButton,
+  Box,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"; // Six-dot Menu Icon
+import SearchIcon from "@mui/icons-material/Search";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import "./WidgetAccordion.css";
+
+const WidgetAccordion = () => {
+  const [expanded, setExpanded] = useState<boolean>(true);
+  const [searchVisible, setSearchVisible] = useState<boolean>(false);
+  const [position, setPosition] = useState({ x: 20, y: 20 });
+  const dragRef = useRef<HTMLDivElement>(null);
+  const offset = useRef({ x: 0, y: 0 });
+
+  // Toggle Accordion
+  const handleToggle = () => setExpanded(!expanded);
+
+  // Toggle Search Bar
+  const handleSearchToggle = () => setSearchVisible(!searchVisible);
+
+  // Dragging Logic
+  const handleMouseDown = (event: React.MouseEvent) => {
+    if (!dragRef.current) return;
+    offset.current = {
+      x: event.clientX - position.x,
+      y: event.clientY - position.y,
+    };
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (event: MouseEvent) => {
+    setPosition({
+      x: event.clientX - offset.current.x,
+      y: event.clientY - offset.current.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={dragRef}
+      className="draggable"
+      style={{ left: position.x, top: position.y }}
+    >
+      <Accordion expanded={expanded} className="widget-accordion">
+        {/* Header */}
+        <AccordionSummary className="accordion-summary" onMouseDown={handleMouseDown}>
+          {/* Left Arrow Icon */}
+          <IconButton className="icon-button">
+            <ChevronLeftIcon />
+          </IconButton>
+
+          {/* Center Menu Icon (Six Dots) */}
+          <DragIndicatorIcon className="menu-icon" />
+
+          {/* Search Icon */}
+          <Box className="search-container">
+            {searchVisible && <TextField className="search-input active" placeholder="Search..." />}
+            <IconButton className="search-icon" onClick={handleSearchToggle}>
+              <SearchIcon />
+            </IconButton>
+          </Box>
+        </AccordionSummary>
+
+        {/* Accordion Content */}
+        <AccordionDetails>
+          <p>Widget Content Goes Here...</p>
+        </AccordionDetails>
+      </Accordion>
+    </div>
+  );
+};
+
+export default WidgetAccordion;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useState } from "react";
 import {
   Accordion,
