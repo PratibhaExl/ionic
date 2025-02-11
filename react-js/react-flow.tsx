@@ -1,5 +1,22 @@
 
+const DraggableParent = styled.div`
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  cursor: grab;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 
+  &:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+  }
+`;
 
 .draggable-parent {
   position: fixed; /* Keeps it fixed in the viewport */
