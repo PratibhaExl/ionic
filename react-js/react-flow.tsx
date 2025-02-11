@@ -1,4 +1,52 @@
 
+import React from "react";
+import Draggable from "react-draggable";
+
+export default function DraggableSection() {
+  return (
+    <Draggable handle=".drag-handle" cancel=".dnd-item">
+      <div className="draggable-section">
+        {/* This is the handle to drag the entire section */}
+        <div className="drag-handle">Drag Me (Entire Section)</div>
+
+        {/* These elements will NOT move the whole section */}
+        <div className="dnd-item">Drag & Drop Element 1</div>
+        <div className="dnd-item">Drag & Drop Element 2</div>
+      </div>
+    </Draggable>
+  );
+}
+
+
+.draggable-section {
+  width: 300px;
+  padding: 10px;
+  border: 2px dashed #007bff;
+  background: #f8f9fa;
+  position: absolute;
+}
+
+.drag-handle {
+  cursor: grab;
+  background: #007bff;
+  color: white;
+  padding: 8px;
+  text-align: center;
+}
+
+.dnd-item {
+  padding: 8px;
+  margin: 5px 0;
+  background: white;
+  border: 1px solid #ddd;
+  cursor: move;
+}
+
+
+
+
+
+
 const DraggableParent = styled.div`
   position: fixed;
   top: 10px;
