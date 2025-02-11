@@ -2,6 +2,168 @@
 
 
 
+
+
+/* Leva-like Dark Theme */
+.widget-accordion {
+  width: 320px;
+  position: fixed;
+  top: 10px;
+  right: 50%;
+  transform: translateX(50%);
+  border-radius: 8px;
+  background: #1e1e1e;
+  color: #ffffff;
+  user-select: none;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  font-family: "Arial", sans-serif;
+}
+
+/* Accordion Header */
+.accordion-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #252525;
+  padding: 8px 12px;
+  border-radius: 8px 8px 0 0;
+  cursor: grab;
+}
+
+.accordion-summary:active {
+  cursor: grabbing;
+}
+
+/* Left, Center, and Right Icons */
+.icon-button {
+  color: #aaa;
+  transition: color 0.3s;
+}
+
+.icon-button:hover {
+  color: #ffffff;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  cursor: grab;
+  color: #888;
+}
+
+/* Search Bar */
+.search-container {
+  display: flex;
+  align-items: center;
+  background: #333;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.search-input {
+  display: none;
+  background: #444;
+  border-radius: 4px;
+  color: #fff;
+  outline: none;
+  padding: 4px;
+  border: none;
+  width: 120px;
+  font-size: 14px;
+}
+
+.search-input.active {
+  display: block;
+}
+
+.search-icon {
+  color: #aaa;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.search-icon:hover {
+  color: #ffffff;
+}
+
+/* Accordion Content */
+.accordion-details {
+  background: #2c2c2c;
+  padding: 10px;
+  border-radius: 0 0 8px 8px;
+}
+
+/* Draggable Cursor */
+.draggable {
+  position: absolute;
+  cursor: grab;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+
+
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  TextField,
+  IconButton,
+  Box,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"; // Six-dot Menu Icon
+import SearchIcon from "@mui/icons-material/Search";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import "./WidgetAccordion.css";
+
+const WidgetAccordion = () => {
+  const [expanded, setExpanded] = useState<boolean>(true);
+  const [searchVisible, setSearchVisible] = useState<boolean>(false);
+
+  return (
+    <div className="widget-accordion">
+      <Accordion expanded={expanded}>
+        {/* Header */}
+        <AccordionSummary className="accordion-summary">
+          {/* Left Arrow Icon */}
+          <IconButton className="icon-button">
+            <ChevronLeftIcon />
+          </IconButton>
+
+          {/* Center Menu Icon (Six Dots) */}
+          <DragIndicatorIcon className="menu-icon" />
+
+          {/* Search Icon */}
+          <Box className="search-container">
+            {searchVisible && <TextField className="search-input active" placeholder="Search..." />}
+            <IconButton className="search-icon" onClick={() => setSearchVisible(!searchVisible)}>
+              <SearchIcon />
+            </IconButton>
+          </Box>
+        </AccordionSummary>
+
+        {/* Accordion Content */}
+        <AccordionDetails className="accordion-details">
+          <p>Widget Content Goes Here...</p>
+        </AccordionDetails>
+      </Accordion>
+    </div>
+  );
+};
+
+export default WidgetAccordion;
+
+
+
+
+
+
+---------
+
+
 .widget-accordion {
   width: 300px;
   position: absolute;
