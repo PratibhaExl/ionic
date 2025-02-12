@@ -1,4 +1,116 @@
+const handleDragStart = (event: React.DragEvent, item: any) => {
+  event.dataTransfer.setData("application/reactflow", JSON.stringify(item));
+  event.dataTransfer.effectAllowed = "move";
+};
 
+// Modify Draggable Box inside Droppable:
+<Box
+  onDragStart={(event) => handleDragStart(event, item)}
+  draggable
+  sx={{
+    width: 170,
+    height: 160,
+    backgroundColor: "#e3f2fd",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 2,
+    cursor: "grab",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  }}
+>
+  <Typography variant="h4">{item.icon}</Typography>
+  <Typography>{item.name}</Typography>
+</Box>
+
+
+const [open, setOpen] = useState(false);
+
+const toggleDrawer = () => {
+  setOpen((prev) => !prev);
+};
+
+// Sidebar Toggle Button
+<IconButton onClick={toggleDrawer} sx={{ transition: "0.3s" }}>
+  {open ? <ChevronLeft /> : <ChevronRight />}
+</IconButton>
+
+
+flow tsx
+const rippleEffect = keyframes`
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.6; }
+  100% { transform: scale(1.5); opacity: 0; }
+`;
+
+const CustomNode = ({ data }: { data: any }) => (
+  <Box
+    sx={{
+      position: "relative",
+      width: 210,
+      height: 200,
+      backgroundColor: "#f0f4f8",
+      borderRadius: "50%",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+      transition: "0.3s ease-in-out",
+      "&:before": data.id === "default" && {
+        content: '""',
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: "50%",
+        backgroundColor: "rgba(0, 0, 255, 0.2)",
+        animation: `${rippleEffect} 1.5s infinite`,
+      },
+    }}
+  >
+    <Typography variant="h4">{data.icon}</Typography>
+    <Typography>{data.label}</Typography>
+    <IconButton
+      onClick={() => setDeleteConfirm(data.id)}
+      sx={{ position: "absolute", top: 5, right: 5, color: "red" }}
+    >
+      <DeleteIcon />
+    </IconButton>
+    <Handle type="source" position="right" />
+    <Handle type="target" position="left" />
+  </Box>
+);
+
+
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button } from "@mui/material";
+
+const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+const handleDelete = () => {
+  setNodes((prevNodes) => prevNodes.filter((node) => node.id !== deleteConfirm));
+  setDeleteConfirm(null);
+};
+
+<Dialog open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)}>
+  <DialogTitle>Delete Node?</DialogTitle>
+  <DialogContent>
+    <Typography>Are you sure you want to delete this node?</Typography>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+    <Button onClick={handleDelete} color="error">
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>;
+
+
+
+
+
+
+----
 
 
 import React, { useState, useCallback } from "react";
