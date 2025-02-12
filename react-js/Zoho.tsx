@@ -1,69 +1,73 @@
 
 
+
 import React, { useState, useCallback } from "react";
 import ReactFlow, { Background, Controls, addEdge, Node, Edge, Connection, Handle } from "reactflow";
 import "reactflow/dist/style.css";
 import Sidebar from "./Sidebar";
 import { Box, IconButton, Typography } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-const initialNodes: Node[] = [
-  {
-    id: "default",
-    type: "customNode",
-    position: { x: 250, y: 150 },
-    data: { label: "Default Node", icon: "🌟", id: "default" }
-  }
-];
+import { useSpring, animated } from "@react-spring/web";
 
 const Flow: React.FC = () => {
-  const [nodes, setNodes] = useState<Node[]>(initialNodes);
+  const [nodes, setNodes] = useState<Node[]>([
+    { id: "default", type: "customNode", position: { x: 300, y: 150 }, data: { label: "Default", icon: "🌟", id: "default" } }
+  ]);
   const [edges, setEdges] = useState<Edge[]>([]);
 
   const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), []);
 
-  // Remove default node on first drag, add new node
   const onDragEnd = (event: any, item: any) => {
-    const position = { x: Math.random() * 400 + 50, y: Math.random() * 300 + 50 };
+    const position = { x: Math.random() * 500 + 50, y: Math.random() * 400 + 50 };
     
-    setNodes((prevNodes) => {
-      if (prevNodes.some((n) => n.id === "default")) {
-        return [{ id: item.id, type: "customNode", position, data: { label: item.name, icon: item.icon, id: item.id } }];
-      }
-      return [...prevNodes, { id: item.id, type: "customNode", position, data: { label: item.name, icon: item.icon, id: item.id } }];
-    });
+    setNodes((prevNodes) => [
+      ...prevNodes.filter((node) => node.id !== "default"), // Remove default node when a new one is added
+      { id: item.id, type: "customNode", position, data: { label: item.name, icon: item.icon, id: item.id } }
+    ]);
   };
 
-  const deleteNode = (id: string) => {
-    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
-  };
+  const deleteNode = (id: string) => setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+
+  const zoomAnim = useSpring({
+    from: { transform: "scale(1)" },
+    to: async (next) => {
+      while (true) {
+        await next({ transform: "scale(1.1)" });
+        await next({ transform: "scale(1)" });
+      }
+    },
+    config: { tension: 150, friction: 5 }
+  });
 
   const CustomNode = ({ data }: { data: any }) => (
-    <Box
-      sx={{
-        width: 210,
-        height: 200,
-        backgroundColor: "#f0f4f8",
-        borderRadius: 2,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-      }}
-    >
-      <Typography variant="h4">{data.icon}</Typography>
-      <Typography>{data.label}</Typography>
-      <IconButton
-        onClick={() => deleteNode(data.id)}
-        sx={{ position: "absolute", top: 5, right: 5, color: "red" }}
+    <animated.div style={data.id === "default" ? zoomAnim : {}}>
+      <Box
+        sx={{
+          width: 210,
+          height: 200,
+          backgroundColor: "#f0f4f8",
+          borderRadius: "50%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+          transition: "0.3s ease-in-out"
+        }}
       >
-        <DeleteIcon />
-      </IconButton>
-      <Handle type="source" position="right" />
-      <Handle type="target" position="left" />
-    </Box>
+        <Typography variant="h4">{data.icon}</Typography>
+        <Typography>{data.label}</Typography>
+        <IconButton
+          onClick={() => deleteNode(data.id)}
+          sx={{ position: "absolute", top: 5, right: 5, color: "red" }}
+        >
+          <DeleteIcon />
+        </IconButton>
+        <Handle type="source" position="right" />
+        <Handle type="target" position="left" />
+      </Box>
+    </animated.div>
   );
 
   return (
@@ -80,12 +84,11 @@ const Flow: React.FC = () => {
 };
 
 export default Flow;
-
-
 import React, { useState } from "react";
 import { Drawer, IconButton, Accordion, AccordionSummary, AccordionDetails, Box, Typography } from "@mui/material";
 import { ChevronLeft, ChevronRight, ExpandMore } from "@mui/icons-material";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { useSpring, animated } from "@react-spring/web";
 
 interface SidebarProps {
   onDragEnd: (event: any, item: any) => void;
@@ -96,86 +99,92 @@ const Sidebar: React.FC<SidebarProps> = ({ onDragEnd }) => {
   const [items, setItems] = useState([
     { id: "1", name: "File", icon: "📁" },
     { id: "2", name: "Folder", icon: "📂" },
-    { id: "3", name: "Document", icon: "📄" }
+    { id: "3", name: "Document", icon: "📄" },
+    { id: "4", name: "Image", icon: "🖼️" },
+    { id: "5", name: "Video", icon: "🎥" },
+    { id: "6", name: "Music", icon: "🎵" }
   ]);
 
   const toggleDrawer = () => setOpen((prev) => !prev);
 
+  const sidebarAnim = useSpring({ width: open ? 350 : 60, config: { tension: 200, friction: 20 } });
+
   return (
     <Box sx={{ display: "flex" }}>
-      <IconButton onClick={toggleDrawer} sx={{ position: "absolute", left: open ? 260 : 0, transition: "0.3s" }}>
+      <IconButton onClick={toggleDrawer} sx={{ position: "absolute", left: open ? 350 : 0, transition: "0.3s" }}>
         {open ? <ChevronLeft /> : <ChevronRight />}
       </IconButton>
 
-      <Drawer
-        variant="persistent"
-        anchor="left"
-        open={open}
-        sx={{
-          width: 260,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": { width: 260, transition: "0.3s", padding: 2 }
-        }}
-      >
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Sidebar
-        </Typography>
+      <animated.div style={sidebarAnim}>
+        <Drawer
+          variant="persistent"
+          anchor="left"
+          open={open}
+          sx={{
+            "& .MuiDrawer-paper": { width: 350, transition: "0.3s", padding: 2 }
+          }}
+        >
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Sidebar
+          </Typography>
 
-        <Accordion disableGutters elevation={0} sx={{ background: "transparent" }}>
-          <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: 0 }}>
-            <ChevronRight sx={{ marginRight: 1 }} />
-            <Typography>Drag Elements</Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ padding: 0 }}>
-            <DragDropContext
-              onDragEnd={(result) => {
-                if (!result.destination) return;
-                const draggedItem = items.find((item) => item.id === result.draggableId);
-                if (draggedItem) onDragEnd(result, draggedItem);
-              }}
-            >
-              <Droppable droppableId="droppable" isDropDisabled>
-                {(provided) => (
-                  <Box ref={provided.innerRef} {...provided.droppableProps} sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                    {items.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided) => (
-                          <Box
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            sx={{
-                              width: 210,
-                              height: 200,
-                              backgroundColor: "#e3f2fd",
-                              display: "flex",
-                              flexDirection: "column",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              borderRadius: 2,
-                              cursor: "grab",
-                              boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-                            }}
-                          >
-                            <Typography variant="h4">{item.icon}</Typography>
-                            <Typography>{item.name}</Typography>
-                          </Box>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </Box>
-                )}
-              </Droppable>
-            </DragDropContext>
-          </AccordionDetails>
-        </Accordion>
-      </Drawer>
+          <Accordion disableGutters elevation={0} sx={{ background: "transparent" }}>
+            <AccordionSummary expandIcon={<ExpandMore />} sx={{ padding: 0 }}>
+              <ChevronRight sx={{ marginRight: 1 }} />
+              <Typography>Drag Elements</Typography>
+            </AccordionSummary>
+            <AccordionDetails sx={{ padding: 0 }}>
+              <DragDropContext
+                onDragEnd={(result) => {
+                  if (!result.destination) return;
+                  const draggedItem = items.find((item) => item.id === result.draggableId);
+                  if (draggedItem) onDragEnd(result, draggedItem);
+                }}
+              >
+                <Droppable droppableId="droppable" isDropDisabled>
+                  {(provided) => (
+                    <Box ref={provided.innerRef} {...provided.droppableProps} sx={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1 }}>
+                      {items.map((item, index) => (
+                        <Draggable key={item.id} draggableId={item.id} index={index}>
+                          {(provided) => (
+                            <Box
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              sx={{
+                                width: 170,
+                                height: 160,
+                                backgroundColor: "#e3f2fd",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                borderRadius: 2,
+                                cursor: "grab",
+                                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+                              }}
+                            >
+                              <Typography variant="h4">{item.icon}</Typography>
+                              <Typography>{item.name}</Typography>
+                            </Box>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </Box>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </AccordionDetails>
+          </Accordion>
+        </Drawer>
+      </animated.div>
     </Box>
   );
 };
 
 export default Sidebar;
+
 
 
 
