@@ -1,3 +1,163 @@
+
+
+const handleDragStart = (event: React.DragEvent, item: any) => {
+  event.dataTransfer.setData("application/reactflow", JSON.stringify(item));
+  event.dataTransfer.effectAllowed = "move";
+};
+
+// Modify Draggable Box:
+<Box
+  onDragStart={(event) => handleDragStart(event, item)}
+  draggable
+  sx={{
+    width: 170,
+    height: 160,
+    backgroundColor: "#e3f2fd",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 2,
+    cursor: "grab",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+  }}
+>
+  <Typography variant="h4">{item.icon}</Typography>
+  <Typography>{item.name}</Typography>
+</Box>
+
+flow tsx
+import React, { useState, useCallback } from "react";
+import ReactFlow, { Background, Controls, addEdge, Connection, Edge, Handle, Node } from "reactflow";
+import "reactflow/dist/style.css";
+import { Box, Typography, IconButton } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+const Flow: React.FC = () => {
+  const [nodes, setNodes] = useState<Node[]>([]);
+  const [edges, setEdges] = useState<Edge[]>([]);
+  const [lastNodeId, setLastNodeId] = useState<string | null>(null);
+
+  const onDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+
+    const reactFlowBounds = event.currentTarget.getBoundingClientRect();
+    const data = JSON.parse(event.dataTransfer.getData("application/reactflow"));
+
+    if (!data) return;
+
+    const position = {
+      x: event.clientX - reactFlowBounds.left,
+      y: event.clientY - reactFlowBounds.top,
+    };
+
+    const newNodeId = `node-${nodes.length + 1}`;
+    const newNode: Node = {
+      id: newNodeId,
+      type: "customNode",
+      position,
+      data: { label: data.name, icon: data.icon, id: newNodeId },
+    };
+
+    setNodes((prevNodes) => [...prevNodes, newNode]);
+
+    if (lastNodeId) {
+      const newEdge: Edge = { id: `edge-${lastNodeId}-${newNodeId}`, source: lastNodeId, target: newNodeId };
+      setEdges((prevEdges) => [...prevEdges, newEdge]);
+    }
+
+    setLastNodeId(newNodeId);
+  };
+
+  const onDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+
+  const deleteNode = (id: string) => {
+    setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+    setEdges((prevEdges) => prevEdges.filter((edge) => edge.source !== id && edge.target !== id));
+  };
+
+  const deleteEdge = (id: string) => {
+    setEdges((prevEdges) => prevEdges.filter((edge) => edge.id !== id));
+  };
+
+  const CustomNode = ({ data }: { data: any }) => (
+    <Box
+      sx={{
+        width: 210,
+        height: 200,
+        backgroundColor: "#f0f4f8",
+        borderRadius: "50%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+        transition: "0.3s ease-in-out",
+      }}
+    >
+      <Typography variant="h4">{data.icon}</Typography>
+      <Typography>{data.label}</Typography>
+      <IconButton
+        onClick={() => deleteNode(data.id)}
+        sx={{ position: "absolute", top: 5, right: 5, color: "red" }}
+      >
+        <DeleteIcon />
+      </IconButton>
+      <Handle type="source" position="right" />
+      <Handle type="target" position="left" />
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: "flex", height: "100vh" }} onDrop={onDrop} onDragOver={onDragOver}>
+      <ReactFlow nodes={nodes} edges={edges} nodeTypes={{ customNode: CustomNode }}>
+        <Background />
+        <Controls />
+      </ReactFlow>
+    </Box>
+  );
+};
+
+export default Flow;
+
+const CustomEdge = ({ id, sourceX, sourceY, targetX, targetY }: any) => (
+  <g>
+    <path
+      d={`M${sourceX},${sourceY} L${targetX},${targetY}`}
+      stroke="black"
+      strokeWidth="2"
+      fill="none"
+    />
+    <foreignObject x={(sourceX + targetX) / 2 - 10} y={(sourceY + targetY) / 2 - 10} width={20} height={20}>
+      <IconButton onClick={() => deleteEdge(id)} sx={{ background: "white", borderRadius: "50%", padding: 0 }}>
+        <DeleteIcon sx={{ fontSize: 14, color: "red" }} />
+      </IconButton>
+    </foreignObject>
+  </g>
+);
+
+
+<ReactFlow edges={edges} edgeTypes={{ default: CustomEdge }} />
+
+
+
+
+
+
+
+
+
+
+
+
+
+//----new
+
+
 const handleDragStart = (event: React.DragEvent, item: any) => {
   event.dataTransfer.setData("application/reactflow", JSON.stringify(item));
   event.dataTransfer.effectAllowed = "move";
