@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Grid, TextField, Select, MenuItem, Button, CircularProgress, IconButton, Typography } from "@mui/material";
 import { Add, Email, Person } from "@mui/icons-material";
 
@@ -70,121 +71,17 @@ const DataGridComponent: React.FC = () => {
     }, 1000);
   };
 
-  // Define columns with search inputs below headers
+  // Define columns
   const columns: GridColDef[] = [
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      sortable: true,
-      renderHeader: () => (
-        <>
-          <Typography fontWeight="bold">Name</Typography>
-          <TextField
-            size="small"
-            placeholder="Search Name"
-            variant="outlined"
-            fullWidth
-            onChange={(e) => handleSearchChange("name", e.target.value)}
-          />
-        </>
-      ),
-      renderCell: (params: GridRenderCellParams) => (
-        <TextField
-          size="small"
-          value={params.value}
-          onChange={(e) => handleFieldChange(params.row._id, "name", e.target.value)}
-          fullWidth
-        />
-      ),
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-      sortable: true,
-      renderHeader: () => (
-        <>
-          <Typography fontWeight="bold">Email</Typography>
-          <TextField
-            size="small"
-            placeholder="Search Email"
-            variant="outlined"
-            fullWidth
-            onChange={(e) => handleSearchChange("email", e.target.value)}
-          />
-        </>
-      ),
-      renderCell: (params: GridRenderCellParams) => (
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <TextField
-            size="small"
-            value={params.value}
-            onChange={(e) => handleFieldChange(params.row._id, "email", e.target.value)}
-            fullWidth
-          />
-          <IconButton onClick={() => console.log("Email clicked", params.value)}>
-            <Email color="primary" />
-          </IconButton>
-        </Box>
-      ),
-    },
-    {
-      field: "role",
-      headerName: "Role",
-      flex: 1,
-      sortable: true,
-      renderHeader: () => (
-        <>
-          <Typography fontWeight="bold">Role</Typography>
-          <TextField
-            size="small"
-            placeholder="Search Role"
-            variant="outlined"
-            fullWidth
-            onChange={(e) => handleSearchChange("role", e.target.value)}
-          />
-        </>
-      ),
-      renderCell: (params: GridRenderCellParams) => (
-        <Select
-          value={params.value}
-          onChange={(e) => handleRoleChange(params.row._id, e.target.value as string)}
-          size="small"
-          fullWidth
-        >
-          {roleOptions.map((role) => (
-            <MenuItem key={role} value={role}>
-              {role}
-            </MenuItem>
-          ))}
-        </Select>
-      ),
-    },
-    {
-      field: "department",
-      headerName: "Department",
-      flex: 1,
-      sortable: true,
-      renderHeader: () => (
-        <>
-          <Typography fontWeight="bold">Department</Typography>
-          <TextField
-            size="small"
-            placeholder="Search Department"
-            variant="outlined"
-            fullWidth
-            onChange={(e) => handleSearchChange("department", e.target.value)}
-          />
-        </>
-      ),
-    },
+    { field: "name", headerName: "Name", flex: 1, sortable: true },
+    { field: "email", headerName: "Email", flex: 1, sortable: true },
+    { field: "role", headerName: "Role", flex: 1, sortable: true },
+    { field: "department", headerName: "Department", flex: 1, sortable: true },
     {
       field: "actions",
       headerName: "Actions",
       flex: 0.5,
       sortable: false,
-      renderHeader: () => <Typography fontWeight="bold">Actions</Typography>,
       renderCell: () => (
         <Box sx={{ display: "flex", gap: 1 }}>
           <IconButton onClick={() => console.log("User icon clicked")}>
@@ -200,6 +97,42 @@ const DataGridComponent: React.FC = () => {
 
   return (
     <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, textAlign: "center" }}>
+        Data Grid with Search & Actions
+      </Typography>
+
+      {/* Search Row */}
+      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+        <TextField
+          size="small"
+          placeholder="Search Name"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("name", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Email"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("email", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Role"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("role", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Department"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("department", e.target.value)}
+        />
+      </Box>
+
       <Grid container sx={{ margin: "20px 0" }}>
         <Grid item xs={12} justifyContent="center">
           {loading && (
@@ -229,6 +162,12 @@ const DataGridComponent: React.FC = () => {
               "& .MuiDataGrid-sortIcon": {
                 color: "white",
               },
+              "& .MuiDataGrid-cell": {
+                padding: "10px",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#f1f1f1",
+              },
             }}
           />
           <Button variant="contained" color="primary" onClick={handleSave} sx={{ marginTop: 2 }}>
@@ -242,8 +181,10 @@ const DataGridComponent: React.FC = () => {
 
 export default DataGridComponent;
 
+        
 
-------
+
+---2---
 
 
 import React, { useState } from "react";
