@@ -1,4 +1,213 @@
 
+
+
+import React, { useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Box, Grid, TextField, Select, MenuItem, Button, CircularProgress, IconButton, Typography } from "@mui/material";
+import { Add, Email, Person } from "@mui/icons-material";
+
+interface RowData {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  isModified?: boolean;
+}
+
+const initialRows: RowData[] = [
+  { _id: "1", name: "Alice", email: "alice@example.com", role: "Admin", department: "HR" },
+  { _id: "2", name: "Bob", email: "bob@example.com", role: "User", department: "IT" },
+  { _id: "3", name: "Charlie", email: "charlie@example.com", role: "Manager", department: "Finance" },
+];
+
+const roleOptions = ["Admin", "User", "Manager"];
+const departmentOptions: Record<string, string> = {
+  Admin: "HR",
+  User: "IT",
+  Manager: "Finance",
+};
+
+const DataGridComponent: React.FC = () => {
+  const [rows, setRows] = useState<RowData[]>(initialRows);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [searchFilters, setSearchFilters] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
+
+  // Handle search input change
+  const handleSearchChange = (col: string, value: string) => {
+    setSearchFilters((prev) => ({ ...prev, [col]: value.toLowerCase() }));
+  };
+
+  // Handle dropdown selection and mark row as modified
+  const handleRoleChange = (id: string, value: string) => {
+    setRows((prev) =>
+      prev.map((row) =>
+        row._id === id
+          ? {
+              ...row,
+              role: value,
+              department: departmentOptions[value],
+              isModified: true,
+            }
+          : row
+      )
+    );
+
+    // Auto-check modified row
+    setSelectedRows((prev) => [...new Set([...prev, id])]);
+  };
+
+  // Detect modified rows and update only those on Save
+  const handleSave = () => {
+    setLoading(true);
+    const updatedRows = rows.filter((row) => selectedRows.includes(row._id));
+    console.log("Updated Rows:", updatedRows);
+    setTimeout(() => setLoading(false), 1000);
+  };
+
+  // Define columns
+  const columns: GridColDef[] = [
+    { field: "name", headerName: "Name", flex: 1, sortable: true },
+    { field: "email", headerName: "Email", flex: 1, sortable: true },
+    {
+      field: "role",
+      headerName: "Role",
+      flex: 1,
+      sortable: true,
+      renderCell: (params) => (
+        <Select
+          value={params.value}
+          onChange={(e) => handleRoleChange(params.row._id, e.target.value)}
+          fullWidth
+          sx={{
+            backgroundColor: "#f0f0f0",
+            borderRadius: "4px",
+            "& .MuiSelect-select": { padding: "8px" },
+          }}
+        >
+          {roleOptions.map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+          ))}
+        </Select>
+      ),
+    },
+    { field: "department", headerName: "Department", flex: 1, sortable: true },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 0.5,
+      sortable: false,
+      renderCell: () => (
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <IconButton onClick={() => console.log("User clicked")}>
+            <Person color="secondary" />
+          </IconButton>
+          <IconButton onClick={() => console.log("Email clicked")}>
+            <Email color="primary" />
+          </IconButton>
+        </Box>
+      ),
+    },
+  ];
+
+  return (
+    <Box sx={{ padding: 2, backgroundColor: "#f5f5f5", borderRadius: 2 }}>
+      <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, textAlign: "center" }}>
+        Enhanced Data Grid
+      </Typography>
+
+      {/* Search Row */}
+      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+        <TextField
+          size="small"
+          placeholder="Search Name"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("name", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Email"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("email", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Role"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("role", e.target.value)}
+        />
+        <TextField
+          size="small"
+          placeholder="Search Department"
+          variant="outlined"
+          fullWidth
+          onChange={(e) => handleSearchChange("department", e.target.value)}
+        />
+      </Box>
+
+      <Grid container sx={{ margin: "20px 0" }}>
+        <Grid item xs={12} justifyContent="center">
+          {loading && (
+            <Box sx={{ display: "flex", justifyContent: "center", marginBottom: 2 }}>
+              <CircularProgress />
+            </Box>
+          )}
+          <DataGrid
+            rows={rows}
+            rowHeight={50}
+            getRowId={(row) => row._id}
+            columns={columns}
+            checkboxSelection
+            disableSelectionOnClick
+            onRowSelectionModelChange={(newSelection) => setSelectedRows(newSelection as string[])}
+            pageSizeOptions={[5, 10]}
+            sx={{
+              height: rows.length === 0 ? "25vh" : "auto",
+              backgroundColor: "white",
+              borderRadius: "8px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#3f51b5",
+                color: "white",
+                fontWeight: "bold",
+              },
+              "& .MuiDataGrid-sortIcon": {
+                color: "white",
+              },
+              "& .MuiDataGrid-cell": {
+                padding: "10px",
+              },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "#f1f1f1",
+              },
+              "& .MuiDataGrid-checkboxInput": {
+                "&.Mui-checked": {
+                  color: "green",
+                },
+              },
+            }}
+          />
+          <Button variant="contained" color="primary" onClick={handleSave} sx={{ marginTop: 2 }}>
+            Save
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+};
+
+export default DataGridComponent;
+
+
+
+
+//---++++
 import React, { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, Grid, TextField, Select, MenuItem, Button, CircularProgress, IconButton, Typography } from "@mui/material";
