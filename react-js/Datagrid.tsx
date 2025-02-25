@@ -1,5 +1,136 @@
+import React, { useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Box, TextField, Select, MenuItem, IconButton, Button, Checkbox } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import PersonIcon from "@mui/icons-material/Person";
 
+interface RowData {
+  [key: string]: any;
+}
 
+const initialRows: RowData[] = [
+  { _id: "65f4a3b2c1d4e5f6789a1234", requestId: 1080, assignTo: "", status: "Open", requestType: "General Inquiry" },
+  { _id: "65f4a3b2c1d4e5f6789a1235", requestId: 1079, assignTo: "", status: "Open", requestType: "IFP Commission" },
+  { _id: "65f4a3b2c1d4e5f6789a1236", requestId: 1068, assignTo: "", status: "Open", requestType: "General Inquiry" },
+];
+
+const DataTable: React.FC = () => {
+  const [rows, setRows] = useState(initialRows);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [search, setSearch] = useState<{ [key: string]: string }>({});
+
+  const handleDropdownChange = (_id: string, value: string) => {
+    setRows(rows.map(row => row._id === _id ? { ...row, assignTo: value, modified: true } : row));
+  };
+
+  const handleCheckboxChange = (_id: string) => {
+    setSelectedRows(prev => prev.includes(_id) ? prev.filter(i => i !== _id) : [...prev, _id]);
+  };
+
+  const handleSave = () => {
+    const updatedRows = rows.filter(row => row.modified);
+    console.log("Saving data:", updatedRows);
+  };
+
+  const handleSearchChange = (field: string, value: string) => {
+    setSearch(prev => ({ ...prev, [field]: value }));
+  };
+
+  const filteredRows = rows.filter(row => 
+    Object.keys(search).every(field => 
+      row[field]?.toString().toLowerCase().includes(search[field].toLowerCase())
+    )
+  );
+
+  const columns: GridColDef[] = [
+    {
+      field: "select",
+      headerName: "Select",
+      renderCell: (params) => (
+        <Checkbox checked={selectedRows.includes(params.row._id)} onChange={() => handleCheckboxChange(params.row._id)} />
+      ),
+      width: 80,
+    },
+    { field: "requestId", headerName: "Request Id", width: 120 },
+    {
+      field: "assignTo",
+      headerName: "Assign To",
+      width: 150,
+      renderCell: (params) => (
+        <Select
+          value={params.row.assignTo}
+          onChange={(e) => handleDropdownChange(params.row._id, e.target.value)}
+          displayEmpty
+          fullWidth
+          sx={{ backgroundColor: "#fff", borderRadius: 1 }}
+        >
+          <MenuItem value="">-- Select --</MenuItem>
+          <MenuItem value="User A">User A</MenuItem>
+          <MenuItem value="User B">User B</MenuItem>
+        </Select>
+      ),
+    },
+    { field: "status", headerName: "Status", width: 100 },
+    {
+      field: "requestType",
+      headerName: "Request Type",
+      width: 150,
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      renderCell: () => (
+        <>
+          <IconButton sx={{ color: "#007bff" }}><EmailIcon /></IconButton>
+          <IconButton sx={{ color: "#007bff" }}><PersonIcon /></IconButton>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <Box sx={{ padding: 2, margin: "20px 0" }}>
+      <DataGrid
+        rows={filteredRows.map(({ _id, requestId, assignTo, status, requestType }) => ({ _id, requestId, assignTo, status, requestType }))}
+        columns={columns}
+        pageSizeOptions={[5, 10]}
+        autoHeight
+        getRowId={(row) => row._id}
+        sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "#f0f0f0",
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-cell": {
+            padding: "8px",
+          },
+          "& .MuiDataGrid-toolbarContainer": {
+            display: "flex",
+            gap: 2,
+            padding: 1,
+            backgroundColor: "#f8f9fa",
+          },
+        }}
+        components={{
+          Toolbar: () => (
+            <Box sx={{ display: "flex", justifyContent: "space-between", padding: 1, backgroundColor: "#f8f9fa" }}>
+              <TextField size="small" variant="outlined" placeholder="Search Request Id" onChange={(e) => handleSearchChange("requestId", e.target.value)} />
+              <TextField size="small" variant="outlined" placeholder="Search Assign To" onChange={(e) => handleSearchChange("assignTo", e.target.value)} />
+              <TextField size="small" variant="outlined" placeholder="Search Status" onChange={(e) => handleSearchChange("status", e.target.value)} />
+              <TextField size="small" variant="outlined" placeholder="Search Request Type" onChange={(e) => handleSearchChange("requestType", e.target.value)} />
+            </Box>
+          ),
+        }}
+      />
+      <Button variant="contained" onClick={handleSave} sx={{ marginTop: 2, backgroundColor: "#28a745" }}>Save</Button>
+    </Box>
+  );
+};
+
+export default DataTable;
+
+datagrid 
 
 import React, { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
