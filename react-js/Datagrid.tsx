@@ -1,3 +1,175 @@
+
+
+import React, { useState } from "react";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { Box, TextField, Select, MenuItem, IconButton, Button, Checkbox } from "@mui/material";
+import EmailIcon from "@mui/icons-material/Email";
+import PersonIcon from "@mui/icons-material/Person";
+
+interface RowData {
+  _id: string;
+  requestId: number;
+  assignTo: string;
+  status: string;
+  requestType: string;
+  subRequestType: string;
+  modified?: boolean;
+}
+
+const assignToMenuOptions = ["User A", "User B"];
+const requestTypeOptions = ["General Inquiry", "IFP Commission"];
+const subRequestTypeOptions: Record<string, string[]> = {
+  "General Inquiry": ["1099/1095", "Book of Business"],
+  "IFP Commission": ["1099/1095", "Other"]
+};
+
+const initialRows: RowData[] = [
+  { _id: "65f4a3b2c1d4e5f6789a1234", requestId: 1080, assignTo: "", status: "Open", requestType: "General Inquiry", subRequestType: "1099/1095" },
+  { _id: "65f4a3b2c1d4e5f6789a1235", requestId: 1079, assignTo: "", status: "Open", requestType: "IFP Commission", subRequestType: "1099/1095" },
+  { _id: "65f4a3b2c1d4e5f6789a1236", requestId: 1068, assignTo: "", status: "Open", requestType: "General Inquiry", subRequestType: "Book of Business" },
+];
+
+const DataTable: React.FC = () => {
+  const [rows, setRows] = useState(initialRows);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [searchFilters, setSearchFilters] = useState<{ [key: string]: string }>({});
+
+  const handleDropdownChange = (_id: string, value: string, field: keyof RowData) => {
+    setRows(rows.map(row => row._id === _id ? { ...row, [field]: value, modified: true } : row));
+  };
+
+  const handleCheckboxChange = (_id: string) => {
+    setSelectedRows(prev => prev.includes(_id) ? prev.filter(i => i !== _id) : [...prev, _id]);
+  };
+
+  const handleSave = () => {
+    const updatedRows = rows.filter(row => row.modified);
+    console.log("Saving data:", updatedRows);
+  };
+
+  const handleSearchChange = (field: string, value: string) => {
+    setSearchFilters(prev => ({ ...prev, [field]: value.toLowerCase() }));
+  };
+
+  const filteredRows = rows.filter(row => 
+    Object.keys(searchFilters).every(key => row[key]?.toString().toLowerCase().includes(searchFilters[key]))
+  );
+
+  const columns: GridColDef[] = [
+    {
+      field: "select",
+      headerName: "Select",
+      renderCell: (params) => (
+        <Checkbox checked={selectedRows.includes(params.row._id)} onChange={() => handleCheckboxChange(params.row._id)} />
+      ),
+      width: 80,
+    },
+    { field: "requestId", headerName: "Request Id", width: 120 },
+    {
+      field: "assignTo",
+      headerName: "Assign To",
+      width: 150,
+      renderCell: (params) => (
+        <Select
+          value={params.row.assignTo}
+          onChange={(e) => handleDropdownChange(params.row._id, e.target.value, "assignTo")}
+          displayEmpty
+          fullWidth
+          sx={{ backgroundColor: "#fff", borderRadius: 1 }}
+        >
+          <MenuItem value="">-- Select --</MenuItem>
+          {assignToMenuOptions.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>)}
+        </Select>
+      ),
+    },
+    {
+      field: "requestType",
+      headerName: "Request Type",
+      width: 150,
+      renderCell: (params) => (
+        <Select
+          value={params.row.requestType}
+          onChange={(e) => handleDropdownChange(params.row._id, e.target.value, "requestType")}
+          displayEmpty
+          fullWidth
+        >
+          {requestTypeOptions.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>)}
+        </Select>
+      ),
+    },
+    {
+      field: "subRequestType",
+      headerName: "Sub Request Type",
+      width: 150,
+      renderCell: (params) => (
+        <Select
+          value={params.row.subRequestType}
+          onChange={(e) => handleDropdownChange(params.row._id, e.target.value, "subRequestType")}
+          displayEmpty
+          fullWidth
+        >
+          {subRequestTypeOptions[params.row.requestType]?.map(option => <MenuItem key={option} value={option}>{option}</MenuItem>) || []}
+        </Select>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      renderCell: () => (
+        <>
+          <IconButton sx={{ color: "#007bff" }}><EmailIcon /></IconButton>
+          <IconButton sx={{ color: "#007bff" }}><PersonIcon /></IconButton>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <Box sx={{ padding: 2, margin: "20px 0" }}>
+      <Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
+        {columns.map(col => col.field !== "select" && col.field !== "actions" && (
+          <TextField
+            key={col.field}
+            label={`Search ${col.headerName}`}
+            variant="outlined"
+            size="small"
+            onChange={(e) => handleSearchChange(col.field, e.target.value)}
+          />
+        ))}
+      </Box>
+      <DataGrid
+        rows={filteredRows}
+        columns={columns}
+        pageSizeOptions={[5, 10]}
+        autoHeight
+        getRowId={(row) => row._id}
+        sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: "#f0f0f0",
+            fontWeight: "bold",
+          },
+          "& .MuiDataGrid-cell": {
+            padding: "8px",
+          },
+        }}
+      />
+      <Button variant="contained" onClick={handleSave} sx={{ marginTop: 2, backgroundColor: "#28a745" }}>Save</Button>
+    </Box>
+  );
+};
+
+export default DataTable;
+
+
+
+
+-----3
+
+
+
+
+
 import React, { useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Box, TextField, Select, MenuItem, IconButton, Button, Checkbox } from "@mui/material";
