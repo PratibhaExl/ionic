@@ -1,4 +1,95 @@
 
+1. Modify handleRequestTypeChange to Populate subRequestType
+Ensure that subRequestType is updated when requestType changes.
+
+Change This:
+tsx
+Copy code
+const handleRequestTypeChange = (id: string, value: string) => {
+  setRows(prev => prev.map(row =>
+    row._id === id
+      ? { ...row, requestType: value }
+      : row
+  ));
+};
+To This (Auto-populate subRequestType and Set Default):
+tsx
+Copy code
+const requestTypeOptions = [
+  { requestType: "General Inquiry", subType: ["Billing", "Claims", "Coverage"] },
+  { requestType: "IFP Commission", subType: ["Renewal", "Payment", "Adjustment"] },
+  { requestType: "Policy Issue", subType: ["Endorsement", "Cancellation", "Reinstatement"] },
+];
+
+const handleRequestTypeChange = (id: string, value: string) => {
+  const selectedType = requestTypeOptions.find((type) => type.requestType === value);
+  setRows(prev =>
+    prev.map(row =>
+      row._id === id
+        ? {
+            ...row,
+            requestType: value,
+            subRequestType: selectedType ? "-- Select --" : "", // Default "-- Select --"
+            availableSubTypes: selectedType ? selectedType.subType : [], // Store available options
+          }
+        : row
+    )
+  );
+};
+2. Modify SubRequestType Dropdown to Show Options
+Ensure SubRequestType dropdown shows options dynamically.
+
+Change This:
+tsx
+Copy code
+{
+  field: "subRequestType",
+  headerName: "Sub Request Type",
+  width: 200,
+}
+
+{
+  field: "subRequestType",
+  headerName: "Sub Request Type",
+  width: 200,
+  renderCell: (params) => (
+    <Select
+      value={params.row.subRequestType || "-- Select --"}
+      onChange={(e) => handleSubRequestTypeChange(params.row._id, e.target.value)}
+      displayEmpty
+      fullWidth
+      sx={{ backgroundColor: "#f0f0f0", borderRadius: "4px" }}
+      disabled={!params.row.availableSubTypes || params.row.availableSubTypes.length === 0} // Disable if no subtypes
+    >
+      <MenuItem value="">-- Select --</MenuItem>
+      {params.row.availableSubTypes?.map((option) => (
+        <MenuItem key={option} value={option}>
+          {option}
+        </MenuItem>
+      ))}
+    </Select>
+  ),
+}
+3. Add handleSubRequestTypeChange
+Ensure changes to subRequestType are stored correctly.
+
+New Function:
+tsx
+Copy code
+const handleSubRequestTypeChange = (id: string, value: string) => {
+  setRows(prev =>
+    prev.map(row =>
+      row._id === id ? { ...row, subRequestType: value } : row
+    )
+  );
+};
+
+
+
+
+
+
+//////
 
 const handleDragStart = (event: React.DragEvent, item: any) => {
   event.dataTransfer.setData("application/reactflow", JSON.stringify(item));
