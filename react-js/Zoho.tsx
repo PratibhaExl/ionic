@@ -1,4 +1,80 @@
 
+
+
+outside datagrid 
+
+
+
+<Box sx={{ display: "flex", gap: 2, marginBottom: 2 }}>
+  <Select
+    value={selectedRequestType || ""}
+    onChange={(e) => handleRequestTypeChange(e.target.value)}
+    displayEmpty
+    sx={{ backgroundColor: "#f0f0f0", borderRadius: "4px", width: "200px" }}
+  >
+    <MenuItem value="">-- Select Request Type --</MenuItem>
+    {requestTypeOptions.map((type) => (
+      <MenuItem key={type.requestType} value={type.requestType}>
+        {type.requestType}
+      </MenuItem>
+    ))}
+  </Select>
+
+  <Select
+    value={selectedSubRequestType || ""}
+    onChange={(e) => setSelectedSubRequestType(e.target.value)}
+    displayEmpty
+    sx={{ backgroundColor: "#f0f0f0", borderRadius: "4px", width: "200px" }}
+    disabled={!availableSubTypes.length}
+  >
+    <MenuItem value="">-- Select Sub Request Type --</MenuItem>
+    {availableSubTypes.map((option) => (
+      <MenuItem key={option} value={option}>
+        {option}
+      </MenuItem>
+    ))}
+  </Select>
+</Box>
+
+const handleRequestTypeChange = (value: string) => {
+  const selectedType = requestTypeOptions.find((type) => type.requestType === value);
+  setSelectedRequestType(value);
+  setAvailableSubTypes(selectedType ? selectedType.subType : []);
+  setSelectedSubRequestType("-- Select --"); // Default selection
+};
+
+      detect change datagrid 
+
+
+
+const handleChange = (id, field, value) => {
+  setRows((prevRows) =>
+    prevRows.map((row) =>
+      row._id === id
+        ? { ...row, [field]: value, isModified: true }
+        : row
+    )
+  );
+
+  setSelectedRows((prev) => [...new Set([...prev, id])]); // Auto-select row
+};
+
+
+<DataGrid
+  rows={rows}
+  columns={columns}
+  checkboxSelection
+  isRowSelectable={(params) => params.row.isModified || selectedRows.includes(params.row._id)}
+  onRowSelectionModelChange={(newSelection) => setSelectedRows(newSelection)}
+/>
+
+
+
+
+
+
+
+//////
 1. Modify handleRequestTypeChange to Populate subRequestType
 Ensure that subRequestType is updated when requestType changes.
 
