@@ -1,5 +1,59 @@
 
 
+const updateDropdownValues = (
+  question: string,
+  newValue: string,
+  jsonData: any,
+  setJsonData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  setJsonData((prevData: any) => ({
+    ...prevData,
+    fields: prevData.fields.map((field: any) =>
+      field.Question === question ? { ...field, DropDownValue: newValue } : field
+    ),
+  }));
+};
+
+
+
+const bulkUpdateFields = (
+  updates: { question: string; newValue: string }[],
+  jsonData: any,
+  setJsonData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  setJsonData((prevData: any) => ({
+    ...prevData,
+    fields: prevData.fields.map((field: any) => {
+      const update = updates.find((u) => u.question === field.Question);
+      return update ? { ...field, DropDownValue: update.newValue } : field;
+    }),
+  }));
+};
+
+
+// Example state
+const [jsonData, setJsonData] = useState(require("./jsonData.json"));
+
+// Update a single dropdown value
+updateDropdownValues("Request Type", "New Request Type", jsonData, setJsonData);
+
+// Update multiple fields at once
+bulkUpdateFields(
+  [
+    { question: "Request Type", newValue: "Updated Request Type" },
+    { question: "Sub Request Type", newValue: "Updated Sub Request Type" },
+  ],
+  jsonData,
+  setJsonData
+);
+
+
+
+
+
+
+
+
 
 outside datagrid 
 
