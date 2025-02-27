@@ -1,5 +1,70 @@
 
 
+
+const updateDropdownValues = (
+  question: string,
+  newValue: string,
+  jsonData: any,
+  setJsonData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  setJsonData((prevData: any) => {
+    if (!prevData || !Array.isArray(prevData.fields)) {
+      console.error("Fields array is missing or undefined:", prevData);
+      return prevData; // Return previous state if invalid
+    }
+
+    return {
+      ...prevData,
+      fields: prevData.fields.map((field: any) =>
+        field.Question === question ? { ...field, DropDownValue: newValue } : field
+      ),
+    };
+  });
+};
+
+
+
+const [jsonData, setJsonData] = useState<any>(() => {
+  try {
+    return require("./jsonData.json"); // Load JSON safely
+  } catch (error) {
+    console.error("Failed to load JSON:", error);
+    return { fields: [] }; // Fallback to an empty array
+  }
+});
+
+const bulkUpdateFields = (
+  updates: { question: string; newValue: string }[],
+  jsonData: any,
+  setJsonData: React.Dispatch<React.SetStateAction<any>>
+) => {
+  setJsonData((prevData: any) => {
+    if (!prevData || !Array.isArray(prevData.fields)) {
+      console.error("Fields array is missing:", prevData);
+      return prevData;
+    }
+
+    return {
+      ...prevData,
+      fields: prevData.fields.map((field: any) => {
+        const update = updates.find((u) => u.question === field.Question);
+        return update ? { ...field, DropDownValue: update.newValue } : field;
+      }),
+    };
+  });
+};
+
+
+
+
+
+
+
+
+
+
+
+
 const updateDropdownValues = (
   question: string,
   newValue: string,
