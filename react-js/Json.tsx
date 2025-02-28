@@ -1,4 +1,31 @@
 
+import ACARequestArray from "./data.json"; // Import JSON file
+
+const updateMultipleFields = (updates: Record<string, string>) => {
+  console.log("ACARequestArray", ACARequestArray);
+  debugger;
+
+  ACARequestArray[0].fields.forEach((field: { Question: string; DropDownValue: string }) => {
+    console.log("field--", field);
+
+    if (updates[field.Question] !== undefined) {
+      field.DropDownValue = updates[field.Question]; // ✅ Fix: Correctly access `Question` as a key
+    }
+  });
+};
+
+// Example Usage (Updating multiple fields)
+updateMultipleFields({
+  "Request Type": "Request Type 02",
+  "Sub Request Type": "Sub Request Type 2A, Sub Request Type 2B",
+  "Call Back Number": "1234567890",
+});
+
+console.log(ACARequestArray[0].fields); // Verify updated values
+
+
+
+
 
 import ACARequest from "./data.json"; // Directly importing JSON
 
