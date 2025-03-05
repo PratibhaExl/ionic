@@ -1,3 +1,98 @@
+//3
+
+
+const RequestCreate: React.FC = () => {
+  const location = useLocation();
+
+  interface RequestData {
+    requestType: string;
+    callBackNumber: string;
+    products: string;
+    priority: string;
+    email: string;
+    contactDate: string;
+    contactMethod: string;
+    team: string;
+    commentsTemplate: string;
+    comments: string;
+    assignToSelf: string;
+    uploadFile: File[];
+  }
+
+  const prepopulatedData: RequestData = location.state || {
+    requestType: "General Inquiry",
+    callBackNumber: "123-456-7890",
+    products: "Test Product",
+    priority: "High",
+    email: "test@example.com",
+    contactDate: "2025-03-19",
+    contactMethod: "Phone",
+    team: "Test Team",
+    commentsTemplate: "Default Template",
+    comments: "Sample comment",
+    assignToSelf: "Yes",
+    uploadFile: [],
+  };
+
+  const methods = useForm<RequestData>({
+    defaultValues: prepopulatedData,
+  });
+
+  const { handleSubmit, reset, setValue } = methods;
+  const [files, setFiles] = useState<File[]>(prepopulatedData.uploadFile || []);
+
+  useEffect(() => {
+    Object.entries(prepopulatedData).forEach(([key, value]) => {
+      setValue(key as keyof RequestData, value);
+    });
+  }, [setValue]);
+
+  const onSubmit = (data: RequestData) => {
+    console.log("Submitted Data:", { ...data, uploadFile: files });
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && files.length < 4) {
+      setFiles([...files, ...Array.from(event.target.files)].slice(0, 4));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DynamicForm fields={FORM_FIELDS} />
+
+        <Grid item xs={12} sx={{ marginTop: 2 }}>
+          <Typography variant="h6">Uploaded Files</Typography>
+          <input type="file" multiple onChange={handleFileUpload} />
+          <ul>
+            {files.map((file, index) => (
+              <li key={index}>
+                {file.name} 
+                <IconButton size="small" onClick={() => removeFile(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </li>
+            ))}
+          </ul>
+        </Grid>
+
+        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+          <Grid item>
+            <Button variant="contained" color="primary" type="submit">Save</Button>
+          </Grid>
+          <Grid item>
+            <Button variant="outlined" color="secondary" onClick={() => reset(prepopulatedData)}>Reset</Button>
+          </Grid>
+        </Grid>
+      </form>
+    </FormProvider>
+  );
+};
 
 
 
