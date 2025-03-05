@@ -1,6 +1,133 @@
 
 
 
+
+///-----2
+
+
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useForm, FormProvider } from "react-hook-form";
+import { Button, Grid, IconButton, Typography } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DynamicForm from "./DynamicForm";
+
+const FORM_FIELDS = [
+  { name: "requestTitle", label: "Request Title", type: "text" },
+  { name: "description", label: "Description", type: "textarea", fullRow: true },
+  { name: "requestType", label: "Request Type", type: "selectTypeSubType" },
+  { name: "priority", label: "Priority", type: "radio", options: ["Low", "Medium", "High"] },
+  { name: "dueDate", label: "Due Date", type: "date" },
+  { name: "isUrgent", label: "Urgent Request", type: "checkbox" },
+  { name: "notifyAgent", label: "Notify Agent", type: "toggle" },
+  { name: "attachment", label: "Attachments", type: "file" },
+];
+
+const RequestCreate: React.FC = () => {
+  const location = useLocation();
+  const prepopulatedData = location.state || {};
+  const methods = useForm({ defaultValues: prepopulatedData });
+
+  const { handleSubmit, reset, setValue } = methods;
+  const [files, setFiles] = useState<File[]>(prepopulatedData.files || []);
+
+  useEffect(() => {
+    if (prepopulatedData) {
+      Object.entries(prepopulatedData).forEach(([key, value]) => setValue(key, value));
+    }
+  }, [prepopulatedData, setValue]);
+
+  const onSubmit = (data: any) => {
+    console.log("Submitted Data:", { ...data, files });
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && files.length < 4) {
+      setFiles([...files, ...Array.from(event.target.files)].slice(0, 4));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DynamicForm fields={FORM_FIELDS} />
+        
+        <Grid item xs={12} sx={{ marginTop: 2 }}>
+          <Typography variant="h6">Uploaded Files</Typography>
+          <input type="file" multiple onChange={handleFileUpload} />
+          <ul>
+            {files.map((file, index) => (
+              <li key={index}>
+                {file.name} 
+                <IconButton size="small" onClick={() => removeFile(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </li>
+            ))}
+          </ul>
+        </Grid>
+
+        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+          <Grid item>
+            <Button variant="contained" color="primary" type="submit">Save</Button>
+          </Grid>
+          <Grid item>
+            <Button variant="outlined" color="secondary" onClick={() => reset()}>Reset</Button>
+          </Grid>
+        </Grid>
+      </form>
+    </FormProvider>
+  );
+};
+
+export default RequestCreate;
+
+
+const columns: GridColDef[] = [
+  { field: "requestTitle", headerName: "Request Title", width: 200 },
+  { field: "requestType", headerName: "Request Type", width: 200 },
+  { field: "subType", headerName: "Sub Type", width: 200 },
+  { field: "priority", headerName: "Priority", width: 150 },
+  { field: "dueDate", headerName: "Due Date", width: 150 },
+  { field: "isUrgent", headerName: "Urgent", width: 100 },
+  { field: "notifyAgent", headerName: "Notify Agent", width: 100 },
+  {
+    field: "files",
+    headerName: "Files",
+    width: 250,
+    renderCell: (params) =>
+      params.value?.length
+        ? params.value.map((file: File, index: number) => <div key={index}>{file.name}</div>)
+        : "No files",
+  },
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 150,
+    renderCell: (params) => (
+      <Button variant="contained" onClick={() => handleEdit(params.row)}>Edit</Button>
+    ),
+  },
+];
+
+
+
+
+
+
+
+
+
+
+
+
+//////-------------1
+
+
 import React, { useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Grid, TextField, Select, MenuItem, FormControl, InputLabel, Checkbox, FormControlLabel, RadioGroup, Radio, Button } from "@mui/material";
