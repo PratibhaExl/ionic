@@ -1,3 +1,32 @@
+{
+  name: "assignToSelf",
+  label: "Assign to Self",
+  type: "toggle",
+  options: ["Not Assigned", "Assigned"]
+}
+
+
+{fieldConfig.type === "toggle" && (
+  <Controller
+    name={fieldConfig.name}
+    control={control}
+    render={({ field }) => (
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography>{fieldConfig.options?.[0] || "No"}</Typography>
+        <Switch
+          checked={field.value}
+          onChange={(e) => setValue(fieldConfig.name, e.target.checked)}
+        />
+        <Typography>{fieldConfig.options?.[1] || "Yes"}</Typography>
+      </Stack>
+    )}
+  />
+)}
+
+
+
+
+
 
 
 export const FORM_FIELDS = [
