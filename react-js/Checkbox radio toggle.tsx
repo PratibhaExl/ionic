@@ -1,5 +1,212 @@
 
 
+export const FORM_FIELDS = [
+  { name: "requestType", label: "Request Type", type: "selectTypeSubType", isMandatory: true },
+  { name: "callBackNumber", label: "Call Back Number", type: "text" },
+  { name: "products", label: "Products", type: "text" },
+  { name: "priority", label: "Priority", type: "select", options: ["High", "Medium", "Low"] },
+  { name: "email", label: "Email", type: "text" },
+  { name: "contactDate", label: "Contact Date", type: "date" },
+  { name: "contactMethod", label: "Contact Method", type: "select", options: ["Phone", "Email"] },
+  { name: "team", label: "Team", type: "text" },
+  { name: "commentsTemplate", label: "Comments Template", type: "textarea" },
+  { name: "comments", label: "Comments", type: "textarea" },
+  { name: "assignToSelf", label: "Assign to Self", type: "toggle" },
+  {
+    name: "selectedCheckboxes",
+    label: "Select Interests",
+    type: "checkbox",
+    options: ["Option1", "Option2", "Option3"]
+  },
+  {
+    name: "selectedRadio",
+    label: "Choose an Option",
+    type: "radio",
+    options: ["Option A", "Option B"]
+  },
+  { name: "uploadFile", label: "Upload Files", type: "file" }
+];
+
+const DynamicForm: React.FC<{ fields: any[]; control: any; setValue: any }> = ({ fields, control, setValue }) => {
+  return (
+    <Grid container spacing={2}>
+      {fields.map((fieldConfig) => (
+        <Grid item xs={12} md={4} key={fieldConfig.name} className="dynamic-form-field">
+          <FormLabel className="field-label">
+            {fieldConfig.label} {fieldConfig.isMandatory && <span style={{ color: "red" }}>*</span>}
+          </FormLabel>
+
+          {fieldConfig.type === "text" && (
+            <Controller name={fieldConfig.name} control={control} render={({ field }) => <TextField {...field} fullWidth />} />
+          )}
+
+          {fieldConfig.type === "textarea" && (
+            <Controller name={fieldConfig.name} control={control} render={({ field }) => <TextField {...field} multiline rows={3} fullWidth />} />
+          )}
+
+          {fieldConfig.type === "select" && (
+            <Controller
+              name={fieldConfig.name}
+              control={control}
+              render={({ field }) => (
+                <Select {...field} fullWidth>
+                  {fieldConfig.options.map((option: string) => (
+                    <MenuItem key={option} value={option}>
+                      {option}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+          )}
+
+          {fieldConfig.type === "radio" && (
+            <Controller
+              name={fieldConfig.name}
+              control={control}
+              render={({ field }) => (
+                <RadioGroup {...field} row>
+                  {fieldConfig.options.map((option: string) => (
+                    <FormControlLabel key={option} value={option} control={<Radio />} label={option} />
+                  ))}
+                </RadioGroup>
+              )}
+            />
+          )}
+
+          {fieldConfig.type === "checkbox" && (
+            <Controller
+              name={fieldConfig.name}
+              control={control}
+              defaultValue={[]}
+              render={({ field }) => (
+                <FormGroup row>
+                  {fieldConfig.options.map((option: string) => (
+                    <FormControlLabel
+                      key={option}
+                      control={
+                        <Checkbox
+                          checked={field.value.includes(option)}
+                          onChange={(e) => {
+                            const newValue = e.target.checked
+                              ? [...field.value, option]
+                              : field.value.filter((item: string) => item !== option);
+                            setValue(fieldConfig.name, newValue);
+                          }}
+                        />
+                      }
+                      label={option}
+                    />
+                  ))}
+                </FormGroup>
+              )}
+            />
+          )}
+
+          {fieldConfig.type === "toggle" && (
+            <Controller
+              name={fieldConfig.name}
+              control={control}
+              render={({ field }) => (
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography>No</Typography>
+                  <Switch checked={field.value} onChange={(e) => setValue(fieldConfig.name, e.target.checked)} />
+                  <Typography>Yes</Typography>
+                </Stack>
+              )}
+            />
+          )}
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
+
+
+const RequestCreate: React.FC = () => {
+  const location = useLocation();
+  const prepopulatedData = location.state || {
+    requestType: "General Inquiry",
+    priority: "High",
+    selectedCheckboxes: ["Option1"],
+    selectedRadio: "Option A",
+    assignToSelf: true,
+    uploadFile: []
+  };
+
+  const methods = useForm({ defaultValues: prepopulatedData });
+  const { handleSubmit, reset, setValue, control } = methods;
+  const [files, setFiles] = useState(prepopulatedData.uploadFile || []);
+
+  useEffect(() => {
+    Object.entries(prepopulatedData).forEach(([key, value]) => {
+      setValue(key, value);
+    });
+  }, [setValue]);
+
+  const onSubmit = (data: any) => {
+    console.log("Submitted Data:", { ...data, uploadFile: files });
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && files.length < 4) {
+      setFiles([...files, ...Array.from(event.target.files)].slice(0, 4));
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setFiles(files.filter((_, i) => i !== index));
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DynamicForm fields={FORM_FIELDS} control={control} setValue={setValue} />
+
+        <Grid item xs={12} sx={{ marginTop: 2 }}>
+          <Typography variant="h6">Uploaded Files</Typography>
+          <input type="file" multiple onChange={handleFileUpload} />
+          <ul>
+            {files.map((file, index) => (
+              <li key={index}>
+                {file.name} 
+                <IconButton size="small" onClick={() => removeFile(index)}>
+                  <DeleteIcon />
+                </IconButton>
+              </li>
+            ))}
+          </ul>
+        </Grid>
+
+        <Grid container spacing={2} sx={{ marginTop: 2 }}>
+          <Grid item>
+            <Button variant="contained" color="primary" type="submit">
+              Save
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button variant="outlined" color="secondary" onClick={() => reset(prepopulatedData)}>
+              Reset
+            </Button>
+          </Grid>
+        </Grid>
+      </form>
+    </FormProvider>
+  );
+};
+
+
+
+
+
+
+
+
+
+
+
+////////
+
 <Controller
   name="isToggleEnabled"
   control={control}
