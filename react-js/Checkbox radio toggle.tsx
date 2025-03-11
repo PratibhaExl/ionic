@@ -1,3 +1,64 @@
+
+
+
+{fieldConfig.type === "checkbox" && (
+  <Grid item xs={12} className="dynamic-form-field">
+    <FormLabel className="field-label">
+      {fieldConfig.label}{" "}
+      {fieldConfig.isMandatory && <MandatoryMark />}
+    </FormLabel>
+
+    <Controller
+      name={fieldConfig.name}
+      control={control}
+      render={({ field }) => (
+        <FormGroup>
+          {fieldConfig.options.map((option: { key: string; value: string }) => (
+            <FormControlLabel
+              key={option.key}
+              control={
+                <Checkbox
+                  checked={field.value?.includes(option.key) || false}
+                  onChange={(e) => {
+                    const newValue = e.target.checked
+                      ? [...(field.value || []), option.key] // Add checked value
+                      : field.value?.filter((v: string) => v !== option.key); // Remove unchecked value
+                    field.onChange(newValue);
+                  }}
+                />
+              }
+              label={option.value}
+            />
+          ))}
+        </FormGroup>
+      )}
+    />
+  </Grid>
+)}
+
+const FORM_FIELDS = [
+  {
+    name: "features",
+    label: "Select Features",
+    type: "checkbox",
+    isMandatory: true,
+    options: [
+      { key: "feature1", value: "Feature 1" },
+      { key: "feature2", value: "Feature 2" },
+      { key: "feature3", value: "Feature 3" },
+    ],
+  },
+];
+
+
+
+
+//multiple checked 
+
+
+
+
+
 {
   name: "assignToSelf",
   label: "Assign to Self",
