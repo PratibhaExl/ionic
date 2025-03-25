@@ -1,4 +1,127 @@
 
+
+npm install ng2-pdf-viewer
+
+
+ionic generate component PdfViewerModal
+
+
+import { Component, Input } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+
+@Component({
+  selector: 'app-pdf-viewer-modal',
+  templateUrl: './pdf-viewer-modal.component.html',
+  styleUrls: ['./pdf-viewer-modal.component.scss'],
+})
+export class PdfViewerModalComponent {
+  @Input() pdfSrc!: string; // PDF URL or base64 data
+
+  constructor(private modalCtrl: ModalController) {}
+
+  closeModal() {
+    this.modalCtrl.dismiss();
+  }
+
+  customAction() {
+    console.log('Custom action triggered');
+  }
+
+  continueAction() {
+    console.log('Continue button clicked');
+    this.modalCtrl.dismiss();
+  }
+}
+
+html
+  
+<ion-content>
+  <div class="modal-container">
+    <!-- Left Side Buttons -->
+    <div class="left-buttons">
+      <ion-button (click)="customAction()">Action 1</ion-button>
+      <ion-button (click)="customAction()">Action 2</ion-button>
+    </div>
+
+    <!-- PDF Viewer -->
+    <div class="pdf-viewer">
+      <pdf-viewer [src]="pdfSrc" [show-all]="true" style="display: block;"></pdf-viewer>
+    </div>
+
+    <!-- Bottom Continue Button -->
+    <div class="bottom-buttons">
+      <ion-button expand="full" (click)="continueAction()">Continue</ion-button>
+    </div>
+  </div>
+</ion-content>
+
+
+css
+
+  .modal-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.left-buttons {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pdf-viewer {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.bottom-buttons {
+  padding: 10px;
+  text-align: center;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .left-buttons {
+    left: 5px;
+    top: 10px;
+    flex-direction: row;
+  }
+}
+
+
+calling 
+
+async openPdfModal() {
+    const modal = await this.modalCtrl.create({
+      component: PdfViewerModalComponent,
+      componentProps: { pdfSrc: this.pdfUrl },
+      cssClass: 'fullscreen-modal'
+    });
+    await modal.present();
+  }
+
+
+
+.fullscreen-modal {
+  --height: 100%;
+  --width: 100%;
+}
+
+
+
+
+
+
+///ng2 end 
+
 //embed star
 
 <ion-col sizeLg="9" sizeMd="9" sizeXs="12">
