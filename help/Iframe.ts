@@ -93,7 +93,13 @@ updatePDF() {
 
 
 
-
+fixAriaHidden() {
+  setTimeout(() => {
+    const routerOutlet = document.querySelector('ion-router-outlet');
+    if (routerOutlet?.getAttribute('aria-hidden') === 'true') {
+      routerOutlet.removeAttribute('aria-hidden');
+    }
+  }, 500);
 
 
 
