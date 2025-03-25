@@ -62,6 +62,40 @@ export class YourComponent implements AfterViewInit {
 
 
 
+ngAfterViewInit() {
+  setTimeout(() => {
+    this.removeAriaHidden();
+    this.updatePDF();
+  }, 500);
+}
+
+removeAriaHidden() {
+  setTimeout(() => {
+    document.querySelectorAll('[aria-hidden="true"]').forEach((el) => {
+      el.removeAttribute('aria-hidden');
+    });
+  }, 500);
+}
+
+updatePDF() {
+  const blob = this.base64ToBlob(this.baseURL, 'application/pdf');
+  const url = URL.createObjectURL(blob);
+
+  setTimeout(() => {
+    const iframe = document.getElementById("IFrame") as HTMLIFrameElement;
+    if (iframe) {
+      iframe.src = '';
+      iframe.offsetHeight; // Force reflow
+      iframe.src = url;
+    }
+  }, 500);
+}
+
+
+
+
+
+
 
 
 
