@@ -1,4 +1,46 @@
 
+//embed star
+
+<ion-col sizeLg="9" sizeMd="9" sizeXs="12">
+  <div class="embed-container">
+    <embed id="PDFEmbed" type="application/pdf" width="100%" height="750px">
+  </div>
+</ion-col>
+
+ ngAfterViewInit() {
+  setTimeout(() => this.updatePDF(), 500);
+}
+
+updatePDF() {
+  const blob = this.base64ToBlob(this.baseURL, 'application/pdf');
+  const url = URL.createObjectURL(blob);
+
+  setTimeout(() => {
+    const embed = document.getElementById("PDFEmbed") as HTMLEmbedElement;
+    if (embed) {
+      embed.src = url;
+    }
+  }, 500);
+}
+ 
+
+.embed-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+embed {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
+/////embed 
 .iframe-container {
   width: 100%;
   height: 100vh; /* Ensures full height */
