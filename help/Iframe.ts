@@ -1,3 +1,13 @@
+
+ngAfterViewInit() {
+  setTimeout(() => {
+    document.querySelector('ion-router-outlet')?.removeAttribute('aria-hidden');
+  }, 500);
+}
+
+
+
+
 updatePDF(type, event, index) {
   const blob = this.base64ToBlob(this.baseURL, 'application/pdf');
   const url = URL.createObjectURL(blob);
