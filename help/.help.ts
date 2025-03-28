@@ -1,4 +1,45 @@
 
+updateCompanyName(priQuesId: string, secQuesId: string, secAnsType: string) {
+  if (!this.ques[priQuesId]) return; // Ensure primary question exists
+
+  let primeQuestData = this.enrollPortReplaceQues.find(q => q.PRIMARY_QUESTION_MASTER_ID === priQuesId);
+  if (!primeQuestData) return;
+
+  let secQuesIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId);
+  if (secQuesIndex === -1) return;
+
+  let secQuesData = primeQuestData.SecondaryQuestion[secQuesIndex];
+
+  // Check if question is "Company Name" and "Other" is selected
+  if (secAnsType === "Company Name" && this.ques[priQuesId][secQuesId] === "Other") {
+    if (!this.ques[priQuesId][secQuesId + "_other"]) {
+      this.ques[priQuesId][secQuesId + "_other"] = ""; // Initialize empty input field
+    }
+
+    // Check if the new object is already added
+    let addedIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId + "_other");
+    if (addedIndex === -1) {
+      // Create a new object for the additional selection
+      let newQuestionObj = {
+        SECONDARY_QUESTION_ID: secQuesId + "_other",
+        SECONDARY_QUESTION_TXT: "Please specify other Company Name",
+        ANSWER_TYPE_NM: "select",
+        OPTIONS: ["Other"], // Predefined select option
+      };
+
+      // Insert new object right after "Company Name" question
+      primeQuestData.SecondaryQuestion.splice(secQuesIndex + 1, 0, newQuestionObj);
+    }
+  } else {
+    // If "Other" is not selected or is removed, delete the extra field and question object
+    delete this.ques[priQuesId][secQuesId + "_other"];
+
+    let addedIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId + "_other");
+    if (addedIndex !== -1) {
+      primeQuestData.SecondaryQuestion.splice(addedIndex, 1);
+    }
+  }
+}
 
 
 
