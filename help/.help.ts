@@ -1,4 +1,62 @@
 
+OnChangeCompany(priQuesId: string, secQuesId: string, event: any) {
+  if (!this.ques[priQuesId]) return; // Ensure primary question exists
+
+  let primeQuestData = this.enrollPortReplaceQues.find(q => q.PRIMARY_QUESTION_MASTER_ID === priQuesId);
+  if (!primeQuestData) return;
+
+  let secQuesIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId);
+  if (secQuesIndex === -1) return;
+
+  let secQuesData = primeQuestData.SecondaryQuestion[secQuesIndex];
+
+  if (event.value === "Other") {
+    this.ques[priQuesId][secQuesId] = "Other"; // Store 'Other' selection
+
+    // Check if the input field question already exists
+    let addedIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId + "_other");
+    if (addedIndex === -1) {
+      let newQuestionObj = {
+        SECONDARY_QUESTION_ID: secQuesId + "_other",
+        SECONDARY_QUESTION_TXT: "Please specify other Company Name",
+        ANSWER_TYPE_NM: "text",
+      };
+
+      // Insert after "Company Name" question
+      primeQuestData.SecondaryQuestion.splice(secQuesIndex + 1, 0, newQuestionObj);
+    }
+
+    // Ensure input field is initialized
+    if (!this.ques[priQuesId][secQuesId + "_other"]) {
+      this.ques[priQuesId][secQuesId + "_other"] = "";
+    }
+  } else {
+    this.ques[priQuesId][secQuesId] = event.value; // Store selected value
+    delete this.ques[priQuesId][secQuesId + "_other"]; // Remove extra field
+
+    // Remove dynamically added question
+    let addedIndex = primeQuestData.SecondaryQuestion.findIndex(q => q.SECONDARY_QUESTION_ID === secQuesId + "_other");
+    if (addedIndex !== -1) {
+      primeQuestData.SecondaryQuestion.splice(addedIndex, 1);
+    }
+  }
+}
+
+
+OnUpdateCompany(priQuesId: string, secQuesId: string, inputValue: string) {
+  if (!this.ques[priQuesId] || this.ques[priQuesId][secQuesId] !== "Other") return;
+
+  if (inputValue.trim()) {
+    this.ques[priQuesId][secQuesId] = inputValue; // Store user input
+  } else {
+    this.ques[priQuesId][secQuesId] = "Other"; // Keep selection if empty
+  }
+}
+
+
+
+
+/////
 updateCompanyName(priQuesId: string, secQuesId: string, secAnsType: string) {
   if (!this.ques[priQuesId]) return; // Ensure primary question exists
 
