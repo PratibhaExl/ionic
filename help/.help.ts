@@ -1,4 +1,25 @@
 
+
+function buildChildInfoArray(baseChildObjects: any[], numberOfChildren: number): any[] {
+  const updatedArray: any[] = [];
+
+  for (let i = 0; i < numberOfChildren; i++) {
+    const childObjects = baseChildObjects.map((obj) => {
+      const newObj = { ...obj }; // shallow copy
+      if (newObj.name === "ChildInfo") {
+        newObj.label = `Child-${i + 1}`;
+      }
+      return newObj;
+    });
+    updatedArray.push(...childObjects);
+  }
+
+  return updatedArray;
+}
+
+
+
+
 OnChangeCompany(priQuesId: string, secQuesId: string, event: any) {
   if (!this.ques[priQuesId]) return; // Ensure primary question exists
 
