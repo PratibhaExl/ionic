@@ -1,5 +1,32 @@
 
 
+const updateAddMoreChildFields = (newFields: FieldConfig[]) => {
+  const updatedArray = FE_Child_Fields_array.map((item) => {
+    if (item.fields && Array.isArray(item.fields)) {
+      const updatedFields = item.fields.map((field) => {
+        if (field.name === 'AddMore_Child') {
+          return {
+            ...field,
+            fields: [...newFields], // update AddMore_Child's fields
+          };
+        }
+        return field;
+      });
+
+      return {
+        ...item,
+        fields: updatedFields,
+      };
+    }
+    return item;
+  });
+
+  return updatedArray;
+};
+
+
+
+
 function buildChildInfoArray(baseChildObjects: any[], numberOfChildren: number): any[] {
   const updatedArray: any[] = [];
 
