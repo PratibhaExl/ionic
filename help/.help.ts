@@ -1,5 +1,41 @@
 
 
+import { FE_Child_Fields_array } from './your-path/array';
+import { FE_Child_Fields_default } from './your-path/defaults';
+
+const handleChildFieldUpdate = (childrenCount: number) => {
+  // Build multiple child field sets
+  const newFieldSets: FieldConfig[][] = [];
+
+  for (let i = 0; i < childrenCount; i++) {
+    const indexedFields = FE_Child_Fields_default.map((field) => ({
+      ...field,
+      name: `${field.name}_${i + 1}`,
+      label: `${field.label} ${i + 1}`,
+    }));
+    newFieldSets.push(indexedFields);
+  }
+
+  // Flatten to single array
+  const newFields = newFieldSets.flat();
+
+  // Inject new fields into the AddMore_Child block
+  const updatedArray = FE_Child_Fields_array.map((item) => {
+    if (item.name === 'AddMore_Child') {
+      return {
+        ...item,
+        fields: newFields,
+      };
+    }
+    return item;
+  });
+
+  console.log("Updated FE_Child_Fields_array:", updatedArray);
+  return updatedArray;
+};
+
+
+
 const updateAddMoreChildFields = (newFields: FieldConfig[]) => {
   const updatedArray = FE_Child_Fields_array.map((item) => {
     if (item.fields && Array.isArray(item.fields)) {
