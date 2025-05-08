@@ -1,3 +1,104 @@
+parent
+
+
+import { useForm, FormProvider } from "react-hook-form";
+import ChildInfo from "./ChildInfo";
+
+const Enrollment = () => {
+  const methods = useForm({
+    defaultValues: {
+      numberOfChildren: 1, // Default value
+      AddMore_Child: [{ childName: "", childAge: "", childGender: "" }],
+    },
+  });
+
+  const { handleSubmit, reset } = methods;
+
+  const onSubmit = (data: any) => {
+    console.log("Submitted data:", data);
+  };
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <ChildInfo />
+        <button type="submit">Submit</button>
+        <button type="button" onClick={() => reset()}>Reset</button>
+      </form>
+    </FormProvider>
+  );
+};
+
+export default Enrollment;
+
+
+
+
+
+child
+
+
+import { useFormContext, useFieldArray } from "react-hook-form";
+import { useEffect } from "react";
+
+const ChildInfo = () => {
+  const { register, setValue, getValues, watch, control } = useFormContext();
+
+  const { fields, replace } = useFieldArray({
+    control,
+    name: "AddMore_Child",
+  });
+
+  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const count = parseInt(e.target.value);
+    setValue("numberOfChildren", count);
+
+    const newArray = Array.from({ length: count }, () => ({
+      childName: "",
+      childAge: "",
+      childGender: "",
+    }));
+
+    replace(newArray); // Dynamically reset child rows
+  };
+
+  const numberOfChildren = watch("numberOfChildren");
+
+  return (
+    <>
+      <label>Number of Children</label>
+      <select value={numberOfChildren} onChange={handleDropdownChange}>
+        {[1, 2, 3, 4].map((val) => (
+          <option key={val} value={val}>{val}</option>
+        ))}
+      </select>
+
+      {fields.map((item, index) => (
+        <div key={item.id} style={{ marginTop: "10px" }}>
+          <input
+            {...register(`AddMore_Child.${index}.childName`)}
+            placeholder="Child Name"
+          />
+          <input
+            {...register(`AddMore_Child.${index}.childAge`)}
+            placeholder="Child Age"
+          />
+          <input
+            {...register(`AddMore_Child.${index}.childGender`)}
+            placeholder="Child Gender"
+          />
+        </div>
+      ))}
+    </>
+  );
+};
+
+export default ChildInfo;
+
+
+
+
+
 
 
 
