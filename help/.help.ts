@@ -1,5 +1,85 @@
 
 
+
+
+{LocalChildPageData.current.FEChildArray.map((config: any, index: number) =>
+  config.name === 'AddMore_Child' && Array.isArray(config.fields) ? (
+    config.fields.map((group: FieldConfig[], groupIndex: number) => (
+      <div key={groupIndex} className="child-group border p-3 mb-3 rounded">
+        <div className="flex justify-between items-center">
+          <h4 className="text-lg font-semibold">Child {groupIndex + 1}</h4>
+          <button
+            type="button"
+            onClick={() =>
+              handleDeleteChild(
+                groupIndex,
+                LocalChildPageData.current.FEChildArray,
+                (updated) => {
+                  LocalChildPageData.current.FEChildArray = updated;
+                  // You may want to force re-render or useState if needed
+                }
+              )
+            }
+            className="text-red-600 text-sm"
+          >
+            Delete
+          </button>
+        </div>
+        {group.map((field: FieldConfig, idx: number) => (
+          <RenderField key={idx} field={field} control={control} />
+        ))}
+      </div>
+    ))
+  ) : (
+    <DynamicformField
+      key={index}
+      fieldConfig={config}
+      isReview={isReview}
+      updateState={updateState}
+      defaultValues={defaultStates}
+      onChange={
+        config.name === 'Number_of_children'
+          ? (e) => handleBenefitChild(e, config)
+          : undefined
+      }
+      parentFunction={
+        config.name === 'Number_of_children'
+          ? handleBenefitChild
+          : EmptyFunction
+      }
+    />
+  )
+)}
+
+
+export const handleDeleteChild = (
+  index: number,
+  fieldsArray: FieldConfig[],
+  setFieldsArray: (fields: FieldConfig[]) => void
+) => {
+  const updatedFieldsArray = fieldsArray.map((field) => {
+    if (field.name === 'AddMore_Child' && Array.isArray(field.fields)) {
+      const newGroups = [...field.fields];
+      newGroups.splice(index, 1); // remove one group
+      return {
+        ...field,
+        fields: newGroups,
+      };
+    }
+    return field;
+  });
+
+  setFieldsArray(updatedFieldsArray);
+};
+
+
+      
+
+
+
+
+
+
 import { FE_Child_Fields_array } from './your-path/array';
 import { FE_Child_Fields_default } from './your-path/defaults';
 
