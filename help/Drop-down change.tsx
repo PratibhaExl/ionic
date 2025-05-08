@@ -6,10 +6,13 @@ import ChildInfo from "./ChildInfo";
 
 const Enrollment = () => {
   const methods = useForm({
-    defaultValues: {
-      numberOfChildren: 1, // Default value
-      AddMore_Child: [{ childName: "", childAge: "", childGender: "" }],
-    },
+  defaultValues: {
+    numberOfChildren: 1,
+    AddMore_Child: FE_child_arr,
+  },
+});
+
+
   });
 
   const { handleSubmit, reset } = methods;
@@ -38,8 +41,10 @@ export default Enrollment;
 child
 
 
+
 import { useFormContext, useFieldArray } from "react-hook-form";
 import { useEffect } from "react";
+import { FE_child_arr } from "./yourConstantsFile"; // import the structure
 
 const ChildInfo = () => {
   const { register, setValue, getValues, watch, control } = useFormContext();
@@ -54,12 +59,10 @@ const ChildInfo = () => {
     setValue("numberOfChildren", count);
 
     const newArray = Array.from({ length: count }, () => ({
-      childName: "",
-      childAge: "",
-      childGender: "",
+      ...FE_child_arr[0], // use the structure
     }));
 
-    replace(newArray); // Dynamically reset child rows
+    replace(newArray);
   };
 
   const numberOfChildren = watch("numberOfChildren");
@@ -94,6 +97,8 @@ const ChildInfo = () => {
 };
 
 export default ChildInfo;
+
+
 
 
 
