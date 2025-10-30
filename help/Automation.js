@@ -6,6 +6,22 @@
 <b>Time:</b> 2:00 PM - 7:00 PM PST</p>
 <p>Regards,<br>Pratibha</p>
 
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Microsoft Corporation//Outlook 16.0 MIMEDIR//EN
+METHOD:REQUEST
+BEGIN:VEVENT
+UID:@{utcNow()}
+DTSTAMP:@{utcNow()}
+DTSTART;TZID=Pacific Standard Time:20251113T140000
+DTEND;TZID=Pacific Standard Time:20251113T150000
+SUMMARY:Project Review Meeting
+LOCATION:Microsoft Teams Meeting
+DESCRIPTION:Please join using the below Teams link:\n@{outputs('Create_a_Teams_meeting')?['body/joinUrl']}
+ORGANIZER;CN=Pratibha Sharma:mailto:yourname@domain.com
+ATTENDEE;CN=Receiver Name;RSVP=TRUE:mailto:receiver@domain.com
+END:VEVENT
+END:VCALENDAR
 
 
 BEGIN:VCALENDAR
