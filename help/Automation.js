@@ -1,4 +1,10 @@
 
+<p>Hello,</p>
+<p>You are invited to a <b>Project Review Meeting</b>.</p>
+<p><a href="@{outputs('Create_a_Teams_meeting')?['body/joinUrl']}">Join Microsoft Teams Meeting</a></p>
+<p><b>Date:</b> 13 Nov 2025<br>
+<b>Time:</b> 2:00 PM - 7:00 PM PST</p>
+<p>Regards,<br>Pratibha</p>
 
 {
   "name": "FormAndMeetingEmailFlow",
