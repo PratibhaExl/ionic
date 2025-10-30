@@ -6,6 +6,25 @@
 <b>Time:</b> 2:00 PM - 7:00 PM PST</p>
 <p>Regards,<br>Pratibha</p>
 
+
+
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Microsoft Corporation//Outlook 16.0 MIMEDIR//EN
+METHOD:REQUEST
+BEGIN:VEVENT
+UID:@{utcNow()}
+DTSTAMP:@{utcNow()}
+DTSTART;TZID=Pacific Standard Time:20251113T140000
+DTEND;TZID=Pacific Standard Time:20251113T190000
+SUMMARY:Project Review Meeting
+LOCATION:Microsoft Teams Meeting
+DESCRIPTION:Please join using the below Teams link:\n@{outputs('Create_a_Teams_meeting')?['body/joinUrl']}
+END:VEVENT
+END:VCALENDAR
+
+
+
 {
   "name": "FormAndMeetingEmailFlow",
   "type": "Flow",
