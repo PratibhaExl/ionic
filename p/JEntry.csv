@@ -1,0 +1,15 @@
+,,,,,,,
+Line,GL,Account,Category,Pay / Receive,Debit,Credit,Label
+1,121000,Accounts Receivable,Asset Accounts,Pay · AdVantage Media,"$173,488 ",,Accounts Receivable — vendor will pay
+2,400000,Product Sales,Revenue Accounts,Receive · Metropolis Meteors American Football Pvt.,,"$173,488  ",Product Sales — club receives
+3,310010 (made it up),Royalty Expenses,Expense Account,payable to talents from metropolis,"$1,468  ",,Revenue share to be paid to talents
+4,211000,Royalty Payable/Revenue share,Liability Accounts,payable to talents from metropolis,,"$1,468  ",Revenue share to be paid to talents
+,,,,,,,
+Line,GL,Account,Category,Pay / Receive,Debit,Credit,Label
+1,101401,Bank,Asset Accounts,Received ·in bank,"$173,488 ",—,Bank
+2,121000,Accounts Receivable,Asset Accounts,Receive · Metropolis Meteors American Football Pvt.,—,"$173,488  ",Accounts Receivable credit to club
+,,,,,,,
+Line,GL,Account,Category,Pay / Receive,Debit,Credit,Label
+1,211000,Royalty Payable/Revenue share,Liability Accounts,payable to talents from metropolis,"$1,468 ",,Accounts payable — club pays talent pool
+2,101401,Bank,Asset Accounts,Paid · Marcus Johnson,,$264  ,Revenue Share — Marcus Johnson receives
+3,101401,Bank,Asset Accounts,Paid · Carlos Rivera,,"$1,204  ",Revenue Share — Carlos Rivera receives
